@@ -71,7 +71,7 @@ export default function RootLayout({
         className={`${geistSans.variable} bg-white ${geistMono.variable} antialiased`}
       >
         <Toaster
-          richColors
+
           icons={{ info: <BadgeInfo />, success: <BadgeCheck />,warning:<BadgeAlert/> }}
           position="top-right"
         />

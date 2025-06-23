@@ -284,21 +284,19 @@ export default function SearchBar({
         }`}
       >
         <div
-          className={`absolute inset-0 rounded-3xl transition-all duration-300 ${
+          className={`absolute inset-0 rounded-full transition-all duration-300 ${
             isFocused ? "bg-sky-500/25 blur-xl scale-105" : "bg-transparent"
           }`}
         />
         <div
-          className={`relative bg-white/10 backdrop-blur-md rounded-3xl shadow-none hover:shadow-3xl transition-all duration-300 ${
+          className={`relative bg-white/10 backdrop-blur-md rounded-full shadow-none hover:shadow-3xl transition-all duration-300 ${
             !isFocused && "shadow-none"
           }`}
         >
-          <div className="absolute left-6 top-1/2 -translate-y-1/2 z-10">
+          <div className="absolute left-6 rounded-full top-1/2 -translate-y-1/2 z-10">
             <div
               className={`transition-all duration-200 ${
-                isFocused
-                  ? "scale-110 text-sky-500"
-                  : "scale-100 text-sky-500"
+                isFocused ? "scale-110 text-sky-500" : "scale-100 text-sky-500"
               }`}
             >
               <Search className="h-6 w-6" />
@@ -311,7 +309,7 @@ export default function SearchBar({
             placeholder={placeholder}
             className={`w-full h-20 pl-16 pr-40 text-lg font-medium bg-transparent ${
               isFocused && "bg-white border-0"
-            } rounded-3xl border-none outline-none placeholder:text-gray-400 text-gray-800 transition-all duration-300`}
+            } rounded-full border-none outline-none placeholder:text-gray-400 text-gray-800 transition-all duration-300`}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onFocus={() => {
@@ -383,7 +381,7 @@ export default function SearchBar({
               : "opacity-0 -translate-y-5 scale-95 pointer-events-none"
           }`}
         >
-          <Card className="p-4 bg-white/40 backdrop-blur-md shadow-2xl border-0 rounded-3xl">
+          <Card className="p-4 bg-white/40 backdrop-blur-md shadow-2xl border-0 rounded-4xl">
             <div className="space-y-2">
               {filteredSuggestions.map((suggestion, index) => {
                 const categoryInfo = getCategoryInfo(suggestion.category);

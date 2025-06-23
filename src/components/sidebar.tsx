@@ -153,10 +153,10 @@ export function AppSidebar() {
       );
       const data = await res.json();
       if (res.ok) {
-        toast.success("You have successfully logged out!");
-        router.push("/login");
+        toast("You have successfully logged out!");
+        router.push("/");
       } else {
-        toast.error("Logout failed!");
+        toast("Logout failed!");
         console.error("Logout failed:", data);
       }
     } catch (err) {

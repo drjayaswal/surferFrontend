@@ -89,10 +89,7 @@ export default function AuthPage(): ReactElement {
     setErrors({});
     setIsSuccess(false);
     setAuthStep("initial");
-    toast.info(
-      `${activeTab === "login" ? "Login" : "Signup"} to use SurferAI`
-    );
-  }, [activeTab]);
+  }, []);
 
   // Slider animation refs
   const [sliderStyle, setSliderStyle] = useState({ left: 0, width: 0 });
@@ -163,7 +160,7 @@ export default function AuthPage(): ReactElement {
     // Show validation errors as toast
     if (Object.keys(newErrors).length > 0) {
       const firstError = Object.values(newErrors)[0];
-      toast.error(firstError);
+      toast(firstError);
     }
 
     return Object.keys(newErrors).length === 0;
@@ -173,22 +170,21 @@ export default function AuthPage(): ReactElement {
   const sendOTP = async (email: string): Promise<boolean> => {
     try {
       setIsLoading(true);
-      toast.info("Sending verification code...");
 
       const response = await apiClient.generateOtp({ email });
 
       if (response.success) {
-        toast.success(`Verification code sent to ${email}`);
+        toast(`Verification code sent to ${email}`);
         return true;
       } else {
         setErrors({ general: response.message || "Failed to send OTP" });
-        toast.error(response.message || "Failed to send verification code");
+        toast(response.message || "Failed to send verification code");
         return false;
       }
     } catch (error) {
       const errorMsg = "Failed to send OTP. Please try again.";
       setErrors({ general: errorMsg });
-      toast.error(errorMsg);
+      toast(errorMsg);
       return false;
     } finally {
       setIsLoading(false);
@@ -201,25 +197,24 @@ export default function AuthPage(): ReactElement {
   ): Promise<boolean> => {
     try {
       setIsLoading(true);
-      toast.info("Verifying your code...");
-
+      
       const response = await apiClient.verifyLoginOtp({
         email,
         otp: Number.parseInt(otp),
       });
 
       if (response.success) {
-        toast.success("Login successful! Welcome back!");
+        toast("Login successful! Welcome back!");
         return true;
       } else {
         setErrors({ general: response.message || "Invalid OTP" });
-        toast.error(response.message || "Invalid verification code");
+        toast(response.message || "Invalid verification code");
         return false;
       }
     } catch (error) {
       const errorMsg = "OTP verification failed. Please try again.";
       setErrors({ general: errorMsg });
-      toast.error(errorMsg);
+      toast(errorMsg);
       return false;
     } finally {
       setIsLoading(false);
@@ -232,24 +227,23 @@ export default function AuthPage(): ReactElement {
   ): Promise<boolean> => {
     try {
       setIsLoading(true);
-      toast.info("Signing you in...");
 
       const response = await apiClient.login({ email, password });
 
       if (response.success) {
-        toast.success("Login successful! Welcome back!");
+        toast("Login successful! Welcome back!");
         return true;
       } else {
         const errorMsg =
           response.message || "Login failed. Please check your credentials.";
         setErrors({ general: errorMsg });
-        toast.error(errorMsg);
+        toast(errorMsg);
         return false;
       }
     } catch (error) {
       const errorMsg = "Login failed. Please check your credentials.";
       setErrors({ general: errorMsg });
-      toast.error(errorMsg);
+      toast(errorMsg);
       return false;
     } finally {
       setIsLoading(false);
@@ -259,7 +253,6 @@ export default function AuthPage(): ReactElement {
   const createAccount = async (userData: FormData): Promise<boolean> => {
     try {
       setIsLoading(true);
-      toast.info("Creating your account...");
 
       // First send OTP
       const otpResponse = await apiClient.generateOtp({
@@ -268,15 +261,15 @@ export default function AuthPage(): ReactElement {
       if (!otpResponse.success) {
         const errorMsg = otpResponse.message || "Failed to send OTP";
         setErrors({ general: errorMsg });
-        toast.error(errorMsg);
+        toast(errorMsg);
         return false;
       }
-      toast.success(`Verification code sent to ${userData.email}`);
+      toast(`Verification code sent to ${userData.email}`);
       return true;
     } catch (error) {
       const errorMsg = "Failed to create account. Please try again.";
       setErrors({ general: errorMsg });
-      toast.error(errorMsg);
+      toast(errorMsg);
       return false;
     } finally {
       setIsLoading(false);
@@ -286,7 +279,6 @@ export default function AuthPage(): ReactElement {
   const verifySignupOTP = async (userData: FormData): Promise<boolean> => {
     try {
       setIsLoading(true);
-      toast.info("Creating your account...");
 
       const fullName = `${userData.firstName} ${userData.lastName}`;
 
@@ -298,20 +290,23 @@ export default function AuthPage(): ReactElement {
       });
 
       if (response.success) {
-        toast.success(
-          `Welcome to Surfer AI, ${userData.firstName}! Account created successfully!`
+        toast(
+          `Welcome to Surfer AI, ${userData.firstName
+            ?.slice(0, 1)
+            .toUpperCase()}${userData.firstName
+            ?.slice(1, userData.firstName.length)}!`
         );
         return true;
       } else {
         const errorMsg = response.message || "Account creation failed";
         setErrors({ general: errorMsg });
-        toast.error(errorMsg);
+        toast(errorMsg);
         return false;
       }
     } catch (error) {
       const errorMsg = "Account creation failed. Please try again.";
       setErrors({ general: errorMsg });
-      toast.error(errorMsg);
+      toast(errorMsg);
       return false;
     } finally {
       setIsLoading(false);
@@ -326,7 +321,6 @@ export default function AuthPage(): ReactElement {
     const success = await loginWithPassword(formData.email, formData.password);
     if (success) {
       setIsSuccess(true);
-      toast.success("Redirecting to dashboard...");
       setTimeout(() => {
         router.push("/");
       }, 1000);
@@ -340,7 +334,6 @@ export default function AuthPage(): ReactElement {
     const success = await createAccount(formData);
     if (success) {
       setAuthStep("otp-verification");
-      toast.info("Please check your email for the verification code");
     }
   };
 
@@ -351,7 +344,6 @@ export default function AuthPage(): ReactElement {
     const success = await sendOTP(formData.email);
     if (success) {
       setAuthStep("otp-verification");
-      toast.info("Please check your email for the password reset code");
     }
   };
 
@@ -369,7 +361,6 @@ export default function AuthPage(): ReactElement {
 
     if (success) {
       setIsSuccess(true);
-      toast.success("Redirecting to dashboard...");
       setTimeout(() => {
         router.push("/");
       }, 1000);
@@ -388,7 +379,7 @@ export default function AuthPage(): ReactElement {
   };
 
   const handleSocialLogin = (provider: string) => {
-    toast.info(`Redirecting to ${provider} login...`);
+    toast(`Redirecting to ${provider} login...`);
     console.log(`Login with ${provider}`);
     // Implement social login logic here
   };
@@ -401,7 +392,6 @@ export default function AuthPage(): ReactElement {
     if (authStep === "otp-verification" || authStep === "forgot-password") {
       setAuthStep("initial");
       setFormData((prev) => ({ ...prev, otp: "" }));
-      toast.info("Returned to main form");
     }
   };
 
@@ -711,9 +701,6 @@ export default function AuthPage(): ReactElement {
                               type="button"
                               onClick={() => {
                                 setAuthStep("forgot-password");
-                                toast.info(
-                                  "Enter your email to reset password"
-                                );
                               }}
                               className="text-sm text-sky-600 hover:text-sky-700"
                             >
@@ -804,7 +791,7 @@ export default function AuthPage(): ReactElement {
                               <Send className="w-8 h-8 text-sky-400" />
                             </div>
                             <h2 className="text-xl font-bold text-gray-800 mb-2">
-                              Reset Password
+                              Login with OTP
                             </h2>
                             <p className="text-gray-600">
                               Enter your email to receive a verification code
@@ -1002,12 +989,7 @@ export default function AuthPage(): ReactElement {
                                   type="button"
                                   variant="outline"
                                   onClick={() => {
-                                    toast.warning(
-                                      "Resending verification code..."
-                                    );
-                                    setTimeout(() => {
-                                      sendOTP(formData.email);
-                                    }, 1000);
+                                    sendOTP(formData.email);
                                   }}
                                   disabled={isLoading}
                                   className="flex-1 h-12 border-0 bg-sky-700/10 hover:bg-sky-600/60 hover:text-white rounded-xl transition-all duration-200"

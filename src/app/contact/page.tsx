@@ -228,7 +228,7 @@ export default function ContactPage() {
     <div className="min-h-screen relative bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
       {/* Animated Wave Background */}
       <div className="absolute inset-0 z-0">
-        <WaveBackground opacity={0.1} />
+        <WaveBackground opacity={0.2} />
       </div>
       <LoginNavigation />
       {/* Hero Section */}

@@ -73,7 +73,7 @@ export default function InteractiveAIPlayground() {
       {/* Top Grid: Settings + Response */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Settings Panel */}
-        <Card className="px-6 pb-6 border-0 bg-white/60 backdrop-blur-md shadow-xl">
+        <Card className="px-6 pb-6 border-0 bg-transparent shadow-none">
           <div className="flex items-center space-x-2">
             <Settings className="h-5 w-5 text-sky-600" />
             <h3 className="text-lg font-medium text-sky-600">Model Settings</h3>
@@ -176,7 +176,7 @@ export default function InteractiveAIPlayground() {
       </div>
 
       {/* Prompt Input Full Width */}
-      <Card className="p-6 lg:col-span-3 border-0 bg-white/60 backdrop-blur-md shadow-xl">
+      <Card className="p-6 lg:col-span-3 border-0 bg-transparent shadow-none">
         <div className="flex items-center space-x-2">
           <FileText className="h-5 w-5 text-sky-600" />
           <h3 className="text-lg font-medium text-sky-600">Your Prompt</h3>
