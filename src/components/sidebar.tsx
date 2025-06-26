@@ -164,7 +164,7 @@ export function AppSidebar() {
     }
   };
   return (
-    <Sidebar collapsible="icon" variant="floating">
+    <Sidebar variant="floating">
       <SidebarHeader className="rounded-t-[9px]">
         <SidebarMenu>
           <SidebarMenuItem>
@@ -393,7 +393,6 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-      <SidebarRail />
     </Sidebar>
   );
 }

@@ -8,7 +8,8 @@ import Link from "next/link";
 const navLinks = [
   { href: "/dashboard/ai", label: "SurferAI" },
   { href: "/dashboard/plans", label: "Plans" },
-  { href: "/contact", label: "Contact" },
+  { href: "/connect", label: "Connect" },
+  { href: "/help", label: "Help" },
   { href: "/login", label: "Login" },
 ];
 export default function Navigation() {

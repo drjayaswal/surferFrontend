@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Footer from "@/components/footer";
-import WaveBackground from "@/components/waveBackground";
 import { Toaster } from "sonner";
-import { BadgeAlert, BadgeCheck, BadgeInfo, Check, CheckCheck, CheckCircle, CheckCircle2, Croissant } from "lucide-react";
+import { BadgeAlert, BadgeCheck, BadgeInfo } from "lucide-react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,6 +16,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Surf the Wave of AI",
+  icons: {
+    icon: "/Surf.png",
+  },
   description:
     "Surfer is your intelligent AI companion for work, research, and creativity. Ask anything, explore insights, and unlock new possibilities — all in one sleek, fast interface.",
   keywords: [
@@ -42,7 +43,7 @@ export const metadata: Metadata = {
     siteName: "Surfer",
     images: [
       {
-        url: "https://surfer.ai/og-image.jpg", // Replace with your OG image
+        url: "favicon.png", // Replace with your OG image
         width: 1200,
         height: 630,
         alt: "Surfer AI OpenGraph Image",
@@ -56,8 +57,8 @@ export const metadata: Metadata = {
     title: "Surfer — Your AI Copilot",
     description:
       "Surfer is an intuitive AI assistant for creators, students, and professionals.",
-    images: ["https://surfer.ai/twitter-card.jpg"], // Replace as needed
-    creator: "@surferai", // If you have a Twitter/X handle
+    images: ["https://surfer.ai/twitter-card.jpg"],
+    creator: "@surferai",
   },
 };
 export default function RootLayout({
@@ -70,11 +71,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} bg-white ${geistMono.variable} antialiased`}
       >
-        <Toaster
-
-          icons={{ info: <BadgeInfo />, success: <BadgeCheck />,warning:<BadgeAlert/> }}
-          position="top-right"
-        />
+        <Toaster position="top-right" />
         {children}
       </body>
     </html>

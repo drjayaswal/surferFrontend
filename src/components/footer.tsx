@@ -129,17 +129,17 @@ export default function Footer() {
 
   const socialLinks = [
     {
-      icon: <Github className="h-4 w-4 sm:h-5 sm:w-5" />,
+      icon: <Github className="h-4 w-4 sm:h-5 sm:w-5 fill-white" />,
       href: "#",
       label: "GitHub",
     },
     {
-      icon: <Twitter className="h-4 w-4 sm:h-5 sm:w-5" />,
+      icon: <Twitter className="h-4 w-4 sm:h-5 sm:w-5 fill-white" />,
       href: "#",
       label: "Twitter",
     },
     {
-      icon: <Linkedin className="h-4 w-4 sm:h-5 sm:w-5" />,
+      icon: <Linkedin className="h-4 w-4 sm:h-5 sm:w-5 fill-white" />,
       href: "#",
       label: "LinkedIn",
     },
@@ -206,9 +206,7 @@ export default function Footer() {
                         <span className="group-hover:translate-x-1 transition-transform duration-200 leading-relaxed">
                           {link.name}
                         </span>
-                        <div className="flex items-center space-x-2">
-                          <ArrowRight className="h-2.5 w-2.5 sm:h-3 sm:w-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                        </div>
+                          <ArrowRight className="ml-5 h-2.5 w-2.5 sm:h-3 sm:w-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                       </Link>
                     </motion.li>
                   ))}

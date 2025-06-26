@@ -28,11 +28,13 @@ import {
   SendHorizonal,
   CheckSquare,
   Waves,
+  Search,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
+import WaveBackground from "@/components/waveBackground";
 
 type Message = {
   id: string;
@@ -271,6 +273,9 @@ export default function DashboardHome() {
 
   return (
     <div className="flex flex-col h-full bg-white text-gray-800 relative rounded-xl ">
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <WaveBackground opacity={0.2} />
+      </div>
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Chat Container */}
@@ -309,7 +314,7 @@ export default function DashboardHome() {
                     {examples.map((example, index) => (
                       <Card
                         key={index}
-                        className="p-4 cursor-pointer transition-all group bg-white border-gray-200 rounded-xl hover:bg-sky-50 hover:border-sky-500 shadow-none border-0"
+                        className="p-4 cursor-pointer transition-all group bg-white border-gray-200 rounded-xl hover:bg-sky-100 hover:border-sky-500 shadow-none border-0"
                         onClick={() => handleExampleClick(example.title)}
                       >
                         <div className="flex items-center justify-center gap-3">
@@ -521,14 +526,14 @@ export default function DashboardHome() {
 
         {/* Floating Input Area */}
         <div>
-          <Card className="rounded-b-xl rounded-t-none border-t-sky-400 pt-4 pb-2 pr-2 pl-1 gap-1 bg-sky-600/5 border-b-0 border-l-0 border-r-0">
-            <div className="relative">
+          <Card className="rounded-b-xl rounded-t-none pt-4 pb-2 pr-2 pl-1 gap-1 bg-transparent border-0">
+            <div className="relative ">
               {/* Input */}
               <Input
                 ref={inputRef}
                 placeholder="Write a query or click on that mic button..."
                 autoFocus
-                className="min-h-[50px] max-h-[200px] resize-none pr-24 pl-12 pb-[9px] text-base border-none shadow-none focus-visible:ring-0 text-gray-800 placeholder:text-black/60 m-0"
+                className="min-h-[50px] max-h-[200px] resize-none pr-24 pl-12 pb-[9px] text-base border-none shadow-none focus-visible:ring-0 text-gray-800 placeholder:text-sky-700 m-0"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 onKeyDown={(e) => {
@@ -546,15 +551,15 @@ export default function DashboardHome() {
               />
 
               {/* Sparkles Icon */}
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-sky-500">
-                <Sparkles className="h-5 w-5" />
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 pb-1 text-sky-700">
+                <Search className="h-5 w-5" />
               </div>
 
               {/* Action Buttons */}
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-2 backdrop-blur-md bg-sky-700/30 p-1 rounded-2xl shadow-inner">
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-2 backdrop-blur-md bg-sky-500/20 p-1 rounded-2xl shadow-inner">
                 {/* Voice Toggle Button */}
                 <Button
-                  className="h-10 w-10 rounded-xl bg-sky-600 hover:bg-sky-700 text-white hover:scale-110 hover:shadow-lg transition-all duration-300 ease-out active:scale-105"
+                  className="h-10 w-10 rounded-xl bg-sky-500 hover:bg-sky-700 text-white hover:scale-110 hover:shadow-lg transition-all duration-300 ease-out active:scale-105"
                   onClick={toggleVoiceRecognition}
                 >
                   {isListening ? (
@@ -570,7 +575,7 @@ export default function DashboardHome() {
                   disabled={!prompt.trim() || isLoading}
                   className={cn(
                     "h-10 w-10 p-0 rounded-xl transition-all duration-300 ease-out",
-                    "text-white bg-sky-700 hover:scale-110 hover:shadow-lg active:scale-105",
+                    "text-white bg-sky-500 hover:scale-110 hover:shadow-lg active:scale-105",
                     (!prompt.trim() || isLoading) &&
                       "opacity-50 cursor-not-allowed"
                   )}
@@ -601,19 +606,6 @@ export default function DashboardHome() {
                   </AnimatePresence>
                 </Button>
               </div>
-            </div>
-
-            {/* Helper Shortcuts */}
-            <div className="items-center justify-center text-[12px] text-gray-400 flex flex-wrap gap-x-10">
-              <span>
-                Press <kbd className="kbd">Esc</kbd> to Clear
-              </span>
-              <span>
-                Press <kbd className="kbd">Enter</kbd> to send
-              </span>
-              <span>
-                Press <kbd className="kbd">Shift + V</kbd> for Voice
-              </span>
             </div>
           </Card>
         </div>
