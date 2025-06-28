@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
-import { BadgeAlert, BadgeCheck, BadgeInfo } from "lucide-react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,13 +32,15 @@ export const metadata: Metadata = {
     "creative AI tools",
     "Surfer app",
   ],
-  authors: [{ name: "Surfer AI Team", url: "https://surfer.ai" }],
+  authors: [{ name: "Surfer AI Team",
+    //  url: "https://surfer.ai" 
+    }],
   creator: "Surfer AI",
   openGraph: {
     title: "Surfer — Surf the Wave of AI Innovation",
     description:
       "Fast. Smart. Beautiful. Meet Surfer, your AI-powered assistant for next-gen productivity.",
-    url: "https://surfer.ai",
+    // url: "https://surfer.ai",
     siteName: "Surfer",
     images: [
       {
@@ -57,8 +58,8 @@ export const metadata: Metadata = {
     title: "Surfer — Your AI Copilot",
     description:
       "Surfer is an intuitive AI assistant for creators, students, and professionals.",
-    images: ["https://surfer.ai/twitter-card.jpg"],
-    creator: "@surferai",
+    images: [""],
+    creator: "@surfer-ai",
   },
 };
 export default function RootLayout({

@@ -398,7 +398,7 @@ export default function ChatHistoryPage() {
                 <motion.div
                   layout
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  className="absolute z-0 top-0 h-full rounded-full bg-sky-500 shadow-lg shadow-black/30"
+                  className="absolute z-0 top-0 h-full rounded-full bg-sky-500 shadow-md"
                   style={{
                     width: bgStyle.width,
                     left: bgStyle.left,
@@ -448,10 +448,13 @@ export default function ChatHistoryPage() {
                     timeFilter
                   ).toLowerCase()}.`}
             </p>
-            <Button className="gap-2 bg-sky-600 rounded-3xl hover:bg-sky-700 text-white" asChild>
-              <Link href={"/dashboard/ai"}>
-              <Waves className="h-4 w-4" />
-              Start SURFing
+            <Button
+              className="gap-2 bg-sky-600 rounded-3xl hover:bg-sky-700 text-white"
+              asChild
+            >
+              <Link href={"//surfer-ai"}>
+                <Waves className="h-4 w-4" />
+                Start SURFing
               </Link>
             </Button>
           </div>

@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-
 import { useState, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,6 +44,7 @@ import {
   XCircle,
   Eye,
   CheckSquare,
+  Tally1,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -52,20 +52,9 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@radix-ui/react-tooltip";
-
-type FileStatus = "processing" | "ready" | "error" | "uploading";
-
-interface CorpusFile {
-  id: string;
-  name: string;
-  type: string;
-  size: number;
-  uploadDate: Date;
-  status: FileStatus;
-  progress?: number;
-  collection?: string;
-  tags?: string[];
-}
+import Folders from "@/components/ui/folder";
+import { CorpusFile, FileStatus } from "@/types/app.types";
+import Toolbar from "@/components/ui/toolbar";
 
 export default function CorpusPage() {
   const [files, setFiles] = useState<CorpusFile[]>([
@@ -332,7 +321,7 @@ export default function CorpusPage() {
             <Button
               variant="outline"
               size="sm"
-              className="gap-2 bg-sky-600/10 hover:bg-gradient-to-r from-sky-300 via-sky-400 to-sky-500 hover:text-white text-sky-600 border-0 hover:shadow-lg hover:scale-102 shadow-none"
+              className="gap-2 bg-sky-600/10 hover:bg-sky-500 hover:text-white text-sky-600 border-0 shadow-none cursor-pointer"
               onClick={() => setShowNewCollectionDialog(true)}
             >
               <FolderPlus className="h-4 w-4" />
@@ -340,7 +329,7 @@ export default function CorpusPage() {
             </Button>
             <Button
               size="sm"
-              className="gap-2 bg-sky-500 hover:bg-sky-600 text-white border-0 hover:shadow-lg hover:scale-102 shadow-none"
+              className="gap-2 bg-sky-500 hover:bg-sky-600 text-white border-0 hover:shadow-lg hover:scale-102 shadow-none cursor-pointer"
               onClick={() => fileInputRef.current?.click()}
             >
               <Paperclip className="h-4 w-4" />
@@ -358,88 +347,20 @@ export default function CorpusPage() {
 
         {/* Main Content */}
         <div className="flex-1 overflow-hidden flex">
-          {/* Sidebar */}
-          <div className="w-64 border-r border-t border-sky-500  p-4 overflow-y-auto">
-            <div>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-sky-700">Total Files:</span>
-                  <span className="font-medium flex gap-2 text-sky-700 items-center">
-                    {files.length > 1 ? (
-                      <>
-                        <Files className="w-3 h-3 text-sky-700" />
-                        {files.length}
-                      </>
-                    ) : (
-                      <>
-                        <File className="w-3 h-3 text-sky-700" />
-                        {files.length}
-                      </>
-                    )}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Ready:</span>
-                  <span className="font-medium text-green-600 flex gap-2 items-center">
-                    <CheckCircle2 className="h-3 w-3" />
-                    {files.filter((f) => f.status === "ready").length}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Processing:</span>
-                  <span className="font-medium text-yellow-500 flex gap-2 items-center">
-                    <Clock className="w-3 h-3" />
-                    {files.filter((f) => f.status === "processing").length}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Errors:</span>
-                  <span className="font-medium text-red-600 flex gap-2 items-center">
-                    <XCircle className="w-3 h-3" />
-                    {files.filter((f) => f.status === "error").length}
-                  </span>
-                </div>
-              </div>
-            </div>
-            {collections.length > 0 && (
-              <div className="mb-6">
-                <h2 className="text-lg font-medium p-2 text-center text-sky-700 mb-2">
-                  Vaults
-                </h2>
-                <ul className="space-y-1">
-                  {collections.map((collection) => (
-                    <li key={collection}>
-                      <Button
-                        variant="ghost"
-                        className={cn(
-                          "w-full justify-between text-sm font-medium text-black hover:bg-sky-600/10 hover:text-sky-700"
-                        )}
-                        onClick={() => setActiveCollection(collection)}
-                      >
-                        <span>{collection}</span>
-                        <span className="text-xs">
-                          ({getFileCount(collection)})
-                        </span>
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-
           {/* Content Area */}
           <div className="flex-1 overflow-hidden flex flex-col">
             {/* Search and Filter Bar */}
             <div className="p-4 border-t border-sky-500">
               <div className="flex items-center gap-3">
                 <div className="relative flex-1">
-                  <Search className="absolute left-[10px] top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <Input
-                    placeholder="Search files by name or tag..."
-                    className="pl-9 border border-sky-200 focus-visible:rounded-4xl focus-visible:ring-0 focus-visible:border-sky-500 transition-all duration-500"
+                  <Toolbar
+                    icon={<Search className="h-8 w-8" />}
+                    rightIcon={<Tally1 className="h-10 w-10" />}
+                    title="Search"
+                    placeholder="Search for File Names, Tags or Extensions..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(value: string) => setSearchQuery(value)}
+                    autoFocus
                   />
                 </div>
               </div>
@@ -447,28 +368,23 @@ export default function CorpusPage() {
 
             {/* File List */}
             <div
-              className="p-8 flex-1 overflow-y-auto"
+              className="px-8 pb-8 pt-2 flex-1 overflow-y-auto"
               onDrop={handleDrop}
               onDragOver={handleDragOver}
             >
               {sortedFiles.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-sky-400 rounded-lg">
-                  <FilePlus className="h-12 w-12 text-gray-400 mb-4" />
+                  <div style={{ position: "relative" }}>
+                    <Folders size={0.5} />
+                  </div>
                   <h3 className="text-lg font-medium text-gray-700 mb-2">
-                    No files found
+                    No Files Uploaded
                   </h3>
                   <p className="text-sm text-gray-500 mb-6 max-w-md">
                     {searchQuery
                       ? "No files match your search criteria. Try a different search term."
                       : "Upload files by clicking the button above or drag and drop files here."}
                   </p>
-                  <Button
-                    className="gap-2 bg-sky-500 hover:bg-sky-600 text-white"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <Upload className="h-4 w-4" />
-                    Upload Files
-                  </Button>
                 </div>
               ) : (
                 <div className="space-y-6">
@@ -604,6 +520,18 @@ export default function CorpusPage() {
             </div>
           </div>
         </div>
+        {sortedFiles.length > 0 && (
+          <div
+            style={{ position: "relative" }}
+            className="justify-center flex mr-150"
+          >
+            <Folders
+              size={0.7}
+              items={files}
+              onItemClick={(index) => alert(`Clicked paper ${index + 1}`)}
+            />{" "}
+          </div>
+        )}
       </div>
 
       {/* New Collection Dialog */}

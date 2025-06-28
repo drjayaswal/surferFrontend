@@ -60,7 +60,6 @@ import {
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
-// Navigation data structure for easy customization
 const navigationData = {
   user: {
     name: "John Doe",
@@ -74,8 +73,8 @@ const navigationData = {
   },
   mainNavigation: [
     {
-      title: "AI",
-      url: "/dashboard/ai",
+      title: "SurferAI",
+      url: "/surfer-ai",
       icon: BrainCog,
       badge: "New",
     },
@@ -164,7 +163,7 @@ export function AppSidebar() {
     }
   };
   return (
-    <Sidebar variant="floating">
+    <Sidebar variant="sidebar">
       <SidebarHeader className="rounded-t-[9px]">
         <SidebarMenu>
           <SidebarMenuItem>

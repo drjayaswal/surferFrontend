@@ -42,25 +42,7 @@ import {
   Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-interface UsageData {
-  date: string;
-  messages: number;
-  tokens: number;
-  conversations: number;
-}
-
-interface TopicData {
-  name: string;
-  value: number;
-  color: string;
-}
-
-interface ModelUsageData {
-  model: string;
-  usage: number;
-  color: string;
-}
+import { UsageData, TopicData, ModelUsageData } from "@/types/app.types";
 
 export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState<
@@ -130,7 +112,7 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex flex-col h-full bg-white">
       {/* Header */}
       <div className="border-b border-sky-600 p-6">
         <div className="flex items-center justify-between mb-6">

@@ -11,11 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import {
-  ArrowRight,
-  Check,
-  Waves,
-} from "lucide-react";
+import { ArrowRight, Check, Waves } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
@@ -123,7 +119,7 @@ export default function UpgradePage() {
                 className={cn(
                   "relative overflow-visible transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white/90 backdrop-blur-sm border-0",
                   plan.popular
-                    ? "ring-2 ring-sky-500 shadow-xl shadow-sky-500/20"
+                    ? "ring-0 ring-sky-500 shadow-xl shadow-sky-500/20"
                     : "shadow-none hover:shadow-none"
                 )}
               >

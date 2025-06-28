@@ -33,6 +33,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "@radix-ui/react-tooltip";
+import { Morphe } from "@/components/ui/notes";
 
 interface SearchQuery {
   id: string;
@@ -263,7 +264,7 @@ export default function CalendarPage() {
       </div>
 
       {/* Calendar Grid */}
-      <div className="flex-1 p-4 overflow-auto">
+      <div className="flex-1 p-4 mt-5 overflow-auto">
         <div className="max-w-6xl mx-auto">
           {/* Day Headers */}
           <div className="grid grid-cols-7 gap-1 mb-2">
@@ -284,10 +285,8 @@ export default function CalendarPage() {
                 key={index}
                 className={cn(
                   "min-h-[108px] p-2 cursor-pointer transition-all duration-200 hover:shadow-md",
-                  dayData.isCurrentMonth
-                    ? "bg-white"
-                    : "opacity-0 cursor-not-allowed",
-                  dayData.isToday && "ring-2 ring-sky-500 bg-sky-50",
+                  dayData.isCurrentMonth ? "bg-white" : "-z-10",
+                  dayData.isToday && "ring-0 ring-sky-500 bg-sky-50",
                   dayData.queries.length > 0 && "border-sky-200 bg-sky-50/50"
                 )}
                 onClick={() => handleDayClick(dayData)}
@@ -329,6 +328,9 @@ export default function CalendarPage() {
               </Card>
             ))}
           </div>
+          <div className="absolute bottom-40 left-[47vw]">
+            <Morphe />
+          </div>
         </div>
       </div>
 
@@ -362,13 +364,13 @@ export default function CalendarPage() {
                     className="p-4 hover:shadow-md transition-all duration-200"
                   >
                     <div className="flex items-center justify-between gap-3">
-                          <h3 className="font-medium text-gray-800 truncate">
-                            {query.query.slice(0, 25)}
-                            {query.query.length > 25 && "..."}
-                          </h3>
+                      <h3 className="font-medium text-gray-800 truncate">
+                        {query.query.slice(0, 25)}
+                        {query.query.length > 25 && "..."}
+                      </h3>
                       <div className="flex justify-center text-sm items-center gap-2">
                         <Clock className="h-3 w-3" />
-                          {query.timestamp.toLocaleTimeString()}
+                        {query.timestamp.toLocaleTimeString()}
                       </div>
                     </div>
                   </Card>

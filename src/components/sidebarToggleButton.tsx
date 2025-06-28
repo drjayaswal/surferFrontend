@@ -15,14 +15,14 @@ export default function SidebarToggleButton({
     <div
       className={clsx(
         "fixed top-[8px] z-50 transition-all duration-300 ",
-        isOpen ? "left-[220px]" : "left-[20px] top-[20px]"
+        isOpen ? "left-[214.5px] top-[50vh]" : "-left-0.5 top-[50vh]"
       )}
     >
       <SidebarTrigger
         className={cn(
           isOpen
-            ? "text-sky-600 hover:bg-sky-600 bg-sky-600/20 stroke-2.5 hover:text-white  rounded-none rounded-bl-[12px] rounded-tr-[12px] shadow-none py-3 backdrop-blur-sm border-0"
-            : "text-white bg-sky-600 stroke-2.5 hover:bg-sky-600 hover:text-white  rounded-full shadow-none py-3 animate-spin",
+            ? "text-sky-600 hover:bg-sky-600 bg-sky-600/20 stroke-2.5 hover:text-white size-10 rounded-l-full shadow-none py-5"
+            : "text-white bg-sky-600 stroke-2.5 hover:bg-sky-600 hover:text-white size-10 rounded-r-full shadow-none py-5",
           className
         )}
       />

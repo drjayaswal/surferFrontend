@@ -6,7 +6,7 @@ import { Menu, X } from "lucide-react";
 import Link from "next/link";
 
 const navLinks = [
-  { href: "/dashboard/ai", label: "SurferAI" },
+  { href: "/surfer-ai", label: "SurferAI" },
   { href: "/dashboard/plans", label: "Plans" },
   { href: "/connect", label: "Connect" },
   { href: "/help", label: "Help" },

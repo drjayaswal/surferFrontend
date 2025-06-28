@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowDown } from "lucide-react";
+import { ArrowDown, Shapes } from "lucide-react";
 import Link from "next/link";
 import WaveBackground from "@/components/waveBackground";
 import Navigation from "@/components/navigation";
@@ -22,13 +22,17 @@ export default function Home() {
 
   useEffect(() => {
     if (urlQuery) {
-      toast.info("Already Logged In..!");
+      toast("Already Logged In..!");
     }
     if (typeof window !== "undefined" && window.history.replaceState) {
       const url = new URL(window.location.href);
       url.searchParams.delete("msg");
       url.searchParams.delete("message");
-      window.history.replaceState({}, document.title, url.pathname + url.search);
+      window.history.replaceState(
+        {},
+        document.title,
+        url.pathname + url.search
+      );
     }
   }, [urlQuery]);
 
@@ -51,7 +55,7 @@ export default function Home() {
   const handleSearch = (query: string) => {
     console.log("Searching for:", query);
     // Redirect to dashboard with search query
-    window.location.href = `/dashboard/ai?q=${encodeURIComponent(query)}`;
+    window.location.href = `/surfer-ai?q=${encodeURIComponent(query)}`;
   };
 
   return (
@@ -97,22 +101,17 @@ export default function Home() {
               Ready to Surf the AI Wave?
             </h2>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/dashboard">
+              <Link href="/surfer-playground">
                 <Button
                   size="lg"
-                  className="bg-transparent  bg-gradient-to-r from-sky-300 via-sky-400 to-sky-500 bg-clip-text text-transparent px-1 py-5 text-xl shadow-none"
+                  className="hover:bg-gradient-to-r hover:from-sky-200 hover:via-sky-400 hover:to-sky-500 px-4 rounded-4xl bg-transparent hover:text-white text-sky-400 py-5 text-xl shadow-none"
                 >
+                  <Shapes className="animate-spin" />
                   Try Surfer Playground
-                  <ArrowDown className="h-6 w-6 text-sky-500 animate-bounce" />
                 </Button>
               </Link>
             </div>
           </motion.div>
-        </div>
-      </section>
-      <section className="pb-10 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <InteractiveAIPlayground />
         </div>
       </section>
       <Footer />

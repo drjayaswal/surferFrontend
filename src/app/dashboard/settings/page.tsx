@@ -219,7 +219,7 @@ export default function SettingsPage() {
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               {/* Profile Tab */}
               <TabsContent value="profile" className="space-y-6">
-                <Card className="border-0">
+                <Card className="border-0 shadow-xl">
                   <CardHeader>
                     <CardTitle className="text-2xl">
                       Profile Information
@@ -307,7 +307,7 @@ export default function SettingsPage() {
 
               {/* Account Tab */}
               <TabsContent value="account" className="space-y-6">
-                <Card className="border-0">
+                <Card className="border-0 shadow-xl">
                   <CardHeader>
                     <CardTitle className="text-2xl">Account Security</CardTitle>
                     <CardDescription>
@@ -433,7 +433,7 @@ export default function SettingsPage() {
 
               {/* Notifications Tab */}
               <TabsContent value="notifications">
-                <Card className="border-0">
+                <Card className="border-0 shadow-xl">
                   <CardHeader>
                     <CardTitle className="text-2xl">
                       Notification Preferences
@@ -562,7 +562,7 @@ export default function SettingsPage() {
 
               {/* Privacy Tab */}
               <TabsContent value="privacy">
-                <Card className="border-0">
+                <Card className="border-0 shadow-xl">
                   <CardHeader>
                     <CardTitle className="text-2xl">Privacy Settings</CardTitle>
                     <CardDescription>
@@ -657,7 +657,7 @@ export default function SettingsPage() {
 
               {/* Activity Tab */}
               <TabsContent value="activity">
-                <Card className="border-0">
+                <Card className="border-0 shadow-xl">
                   <CardHeader>
                     <CardTitle className="text-2xl">Activity Log</CardTitle>
                     <CardDescription>

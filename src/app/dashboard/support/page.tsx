@@ -9,8 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
   Accordion,
@@ -19,8 +17,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import {
-  MessageCircle,
-  Book,
+
   Settings,
   HelpCircle,
   Shield,
@@ -29,14 +26,8 @@ import {
   Mail,
   CheckCircle,
   Lightbulb,
-  Bot,
-  Send,
-  X,
   ThumbsUp,
   ThumbsDown,
-  Users,
-  Clock,
-  Star,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -247,7 +238,7 @@ export default function HelpCenter() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <Card className="border-0 shadow-md overflow-hidden">
+            <Card className="border-0 shadow-none overflow-hidden">
               <CardContent>
                 <div className="space-y-1">
                   {categories.map((category) => (
@@ -291,7 +282,7 @@ export default function HelpCenter() {
 
           {/* Main Content Area */}
           <div className="lg:col-span-3">
-            <Card className="border-0 shadow-sm overflow-hidden">
+            <Card className="border-0 shadow-none overflow-hidden">
               <div className="p-6 bg-white">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-xl font-semibold text-sky-800">

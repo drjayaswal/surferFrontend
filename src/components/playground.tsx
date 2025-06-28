@@ -21,15 +21,9 @@ import {
   Brain,
   FileText,
   RotateCw,
+  Cog,
 } from "lucide-react";
 import { Slider } from "./ui/slider";
-
-interface AIModel {
-  id: string;
-  name: string;
-  description: string;
-  capabilities: string[];
-}
 
 export default function InteractiveAIPlayground() {
   const [temperature, setTemperature] = useState([0.7]);
@@ -69,19 +63,21 @@ export default function InteractiveAIPlayground() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10 space-y-6">
+    <div className="max-w-[92rem] mx-auto px-6 py-16 space-y-12">
       {/* Top Grid: Settings + Response */}
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* Settings Panel */}
-        <Card className="px-6 pb-6 border-0 bg-transparent shadow-none">
-          <div className="flex items-center space-x-2">
-            <Settings className="h-5 w-5 text-sky-600" />
-            <h3 className="text-lg font-medium text-sky-600">Model Settings</h3>
+        <Card className="px-8 pt-8 border-0 bg-white/80 shadow-xl rounded-2xl">
+          <div className="flex items-center space-x-3 mb-1">
+            <Settings className="h-6 w-6 text-sky-700" />
+            <h3 className="text-2xl font-semibold text-sky-700">
+              Model Settings
+            </h3>
           </div>
 
           {/* Temperature */}
-          <div className="text-sky-600">
-            <Label className="text-sm font-medium mb-2 block">
+          <div className="mb-2">
+            <Label className="text-base font-semibold text-sky-600 mb-2 block">
               Temperature: {temperature[0]}
             </Label>
             <Slider
@@ -91,14 +87,14 @@ export default function InteractiveAIPlayground() {
               min={0}
               step={0.1}
             />
-            <p className="text-xs text-sky-600 font-light mt-2">
-              Controls randomness (0 = focused, 2 = creative)
+            <p className="text-sm text-sky-600/70 font-light mt-2">
+              (0 = focused, 2 = creative)
             </p>
           </div>
 
           {/* Max Tokens */}
-          <div className="text-sky-600">
-            <Label className="text-sm font-medium block mb-2">
+          <div className="mb-2">
+            <Label className="text-base font-semibold text-sky-600 mb-2 block">
               Max Tokens: {maxTokens[0]}
             </Label>
             <Slider
@@ -108,21 +104,21 @@ export default function InteractiveAIPlayground() {
               min={50}
               step={10}
             />
-            <p className="text-xs text-sky-600 font-light mt-2">
-              Maximum length of the response
+            <p className="text-base text-sky-600/70 font-light mt-2">
+              {maxTokens} length of response
             </p>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex space-x-2">
+          <div className="flex space-x-3">
             <Button
               onClick={handleGenerate}
               disabled={isGenerating || !prompt.trim()}
-              className="flex-1 bg-gradient-to-r from-sky-200 via-sky-400 to-sky-600 hover:bg-sky-600 text-white shadow-none hover:shadow-lg hover:rounded-4xl rounded-lg duration-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="flex-1 py-5 text-lg bg-gradient-to-r from-sky-300 via-sky-500 to-sky-700 text-white hover:shadow-xl transition-all rounded-xl disabled:opacity-60"
             >
               {isGenerating ? (
                 <>
-                  <Zap className="h-4 w-4 mr-2 animate-spin" />
+                  <Cog className="h-5 w-5 mr-2 animate-spin" />
                   Generating...
                 </>
               ) : (
@@ -130,73 +126,68 @@ export default function InteractiveAIPlayground() {
               )}
             </Button>
             <Button
-              variant="outline"
-              className="text-sky-500 shadow-none border-0 bg-transparent rounded-none hover:bg-transparent hover:animate-spin cursor-pointer"
+              variant="ghost"
               onClick={handleReset}
+              className="text-sky-600 hover:bg-sky-100 rounded-full"
             >
-              <RotateCw className="h-4 w-4" />
+              <RotateCw className="h-5 w-5" />
             </Button>
           </div>
         </Card>
 
         {/* Output Panel */}
-        <Card className="p-6 lg:col-span-2 space-y-4 border-0 bg-transparent shadow-none">
-          <div className="flex items-center space-x-2 mb-2">
-            <Brain className="h-5 w-5 text-sky-600" />
-            <h3 className="text-lg font-medium text-sky-600">AI Response</h3>
+        <Card className="lg:col-span-2 px-8 py-8 bg-white/80 shadow-xl rounded-2xl border-0">
+          <div className="flex items-center space-x-3 mb-4">
+            <Brain className="h-6 w-6 text-sky-700" />
+            <h3 className="text-2xl font-semibold text-sky-700">AI Response</h3>
             {output && (
-              <div className="mt-1 text-xs text-sky-600">
-                <span className="font-medium">with {output.length} tokens</span>
-              </div>
+              <span className="ml-2 text-lg text-sky-600/70">
+                ({output.length} tokens)
+              </span>
             )}
             {isGenerating && (
               <div className="ml-auto flex items-center space-x-2">
-                <div className="w-2 h-2 bg-sky-500 rounded-full animate-pulse" />
-                <span className="text-sm text-sky-600">Generating...</span>
+                <div className="w-2 h-2 bg-sky-500 rounded-full animate-ping" />
+                <span className="text-lg text-sky-600">Generating...</span>
               </div>
             )}
           </div>
 
-          <div className="h-full p-4 bg-transparent rounded-lg">
+          <div className="min-h-[220px] p-5 rounded-xl border border-sky-100 shadow-inner items-center justify-center">
             {output ? (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="text-sky-600/60 font-light whitespace-pre-wrap"
+                className="text-base text-sky-700 whitespace-pre-wrap leading-relaxed"
               >
                 {output}
               </motion.div>
             ) : (
-              <div className="text-gray-400 italic">
+              <p className="text-gray-400 italic">
                 AI response will appear here...
-              </div>
+              </p>
             )}
           </div>
         </Card>
       </div>
 
-      {/* Prompt Input Full Width */}
-      <Card className="p-6 lg:col-span-3 border-0 bg-transparent shadow-none">
-        <div className="flex items-center space-x-2">
-          <FileText className="h-5 w-5 text-sky-600" />
-          <h3 className="text-lg font-medium text-sky-600">Your Prompt</h3>
+      {/* Prompt Input Section */}
+      <Card className="px-8 py-8 bg-white/80 shadow-xl rounded-2xl border-0">
+        <div className="flex items-center space-x-3 mb-4">
+          <FileText className="h-6 w-6 text-sky-700" />
+          <h3 className="text-2xl font-semibold text-sky-700">Your Prompt</h3>
           {prompt.length > 0 && (
-            <span className="mt-1 text-xs text-sky-600">
-              with {prompt.length} characters
+            <span className="ml-2 text-lg text-sky-600/70">
+              ({prompt.length} characters)
             </span>
           )}
         </div>
         <Textarea
-          placeholder="Enter your prompt here..."
+          placeholder="Type your creative or technical prompt here..."
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          className="resize-none focus-visible:ring-0 border-dotted border-0 placeholder:text-gray-500 placeholder:italic shadow-none border-sky-600/20 placeholder:text-md"
+          className="md:text-xl min-h-[80px] focus-visible:ring-0 border-dotted border-0 placeholder:text-gray-500 placeholder:italic bg-transparent shadow-none border-sky-600/20"
         />
-        <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
-          <span className="text-sky-600/60">
-            Press Shift+Enter for New Line
-          </span>
-        </div>
       </Card>
     </div>
   );
