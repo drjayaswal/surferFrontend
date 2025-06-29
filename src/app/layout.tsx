@@ -53,14 +53,14 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "Surfer — Your AI Copilot",
-    description:
-      "Surfer is an intuitive AI assistant for creators, students, and professionals.",
-    images: [""],
-    creator: "@surfer-ai",
-  },
+  // twitter: {
+  //   card: "summary_large_image",
+  //   title: "Surfer — Your AI Copilot",
+  //   description:
+  //     "Surfer is an intuitive AI assistant for creators, students, and professionals.",
+  //   images: [""],
+  //   creator: "@surfer-ai",
+  // },
 };
 export default function RootLayout({
   children,

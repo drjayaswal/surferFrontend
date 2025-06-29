@@ -28,30 +28,9 @@ import Link from "next/link";
 import { apiClient } from "@/lib/api";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { AuthStep, FormData, FormErrors } from "@/types/app.types";
+import Footer from "@/components/footer";
 
-type AuthStep = "initial" | "forgot-password" | "otp-verification" | "success";
-
-interface FormData {
-  email: string;
-  password: string;
-  confirmPassword?: string;
-  firstName?: string;
-  lastName?: string;
-  rememberMe?: boolean;
-  otp?: string;
-}
-
-interface FormErrors {
-  email?: string;
-  password?: string;
-  confirmPassword?: string;
-  firstName?: string;
-  lastName?: string;
-  general?: string;
-  otp?: string;
-}
-
-// Step transition variants inspired by the stepper
 const stepVariants: Variants = {
   enter: (direction: number) => ({
     x: direction > 0 ? "100%" : "-100%",
@@ -67,7 +46,6 @@ const stepVariants: Variants = {
   }),
 };
 
-// Step content wrapper component
 interface StepContentWrapperProps {
   currentStep: string;
   direction: number;
@@ -1449,6 +1427,7 @@ export default function AnimatedAuthPage(): ReactElement {
           </motion.div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

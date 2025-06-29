@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -37,30 +37,31 @@ import {
   Info,
   Camera,
   Zap,
+  Loader2,
+  MessageCircleQuestion,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-
-type ActivityLog = {
-  id: string;
-  action: string;
-  timestamp: Date;
-  details: string;
-  type: "success" | "warning" | "info";
-};
+import { cn, toBase64 } from "@/lib/utils";
+import { ActivityLog } from "@/types/app.types";
+import { apiClient } from "@/lib/api";
+import { toast } from "sonner";
+import { userStore } from "@/stores/userStore";
+import { useHydrateUser } from "@/hooks/useHydrateUser";
+import { Tooltip } from "@/components/ui/tooltip";
+import { TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function SettingsPage() {
+  useHydrateUser();
+
+  const user = userStore((s) => s.user);
+  const loading = userStore((s) => s.loading);
+  const setUser = userStore((s) => s.setUser);
+  const authChecked = userStore((s) => s.authChecked);
   const [showPassword, setShowPassword] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   const [unsavedChanges, setUnsavedChanges] = useState(false);
-
-  // Form states
-  const [profileData, setProfileData] = useState({
-    name: "Jason Smith",
-    email: "jason@example.com",
-    bio: "AI enthusiast and product manager",
-    avatar: "/placeholder.svg?height=100&width=100",
-  });
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [siteSettings, setSiteSettings] = useState({
     siteName: "Surfer AI",
@@ -87,6 +88,65 @@ export default function SettingsPage() {
     analyticsTracking: true,
     cookieConsent: true,
   });
+
+  if (!user || loading || !authChecked) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="animate-spin w-6 h-6 text-sky-500" />
+        <p className="ml-2 text-sm text-gray-600">Checking authentication...</p>
+      </div>
+    );
+  }
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    if (files.length > 1) {
+      toast.error("Please upload only one avatar");
+      return;
+    }
+
+    const file = files[0];
+
+    const validTypes = ["image/jpeg", "image/png", "image/gif"];
+    if (!validTypes.includes(file.type)) {
+      toast.error("Only images are allowed");
+      return;
+    }
+
+    const maxSize = 2 * 1024 * 1024;
+    if (file.size > maxSize) {
+      toast.error("Avatar image must be under 2MB");
+      return;
+    }
+
+
+    const toastId = toast.loading("Uploading Avatar...");
+    try {
+      const response = await apiClient.uploadProfilePic({ file });
+      if (response.success) {
+        const base64 = await toBase64(file);
+        const surferRaw = localStorage.getItem("surfer");
+        if (surferRaw) {
+          const surfer = JSON.parse(surferRaw);
+          surfer.state.user.avatar = base64;
+          localStorage.setItem("surfer", JSON.stringify(surfer));
+        }
+        if (user) {
+          setUser({ ...user, avatar: base64 });
+        }
+    
+        toast.dismiss(toastId);
+        toast.success("Avatar Uploaded!");
+      } else {
+        toast.error(response.message || "Failed to upload avatar");
+        toast.dismiss(toastId);
+      }
+    } catch (error) {
+      console.log(`${error}`);
+    }
+  };
 
   const activityLogs: ActivityLog[] = [
     {
@@ -120,23 +180,23 @@ export default function SettingsPage() {
   ];
 
   const handleSave = () => {
-    // Simulate save operation
     setUnsavedChanges(false);
-    // Show success message
+    // Simulate save logic here
   };
 
   const handleExportData = () => {
-    // Simulate data export
     const data = {
-      profile: profileData,
+      profile: user,
       settings: siteSettings,
       notifications,
       privacy,
       exportDate: new Date().toISOString(),
     };
+
     const blob = new Blob([JSON.stringify(data, null, 2)], {
       type: "application/json",
     });
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -146,6 +206,11 @@ export default function SettingsPage() {
 
   const formatTime = (date: Date) => {
     return date.toLocaleString();
+  };
+
+  const handleDeleteData = async () => {
+    localStorage.removeItem("surfer");
+    toast("Your Account is Successfully Deleted!");
   };
 
   return (
@@ -228,39 +293,64 @@ export default function SettingsPage() {
                       Update your personal information and profile settings.
                     </CardDescription>
                   </CardHeader>
-                  <Separator className="bg-[#0f67fe]" />
+                  <Separator className="bg-sky-700" />
                   <CardContent className="space-y-6">
-                    <div className="flex items-center gap-6">
-                      <Avatar className="h-20 w-20">
-                        <AvatarImage
-                          src={profileData.avatar || "/placeholder.svg"}
-                        />
-                        <AvatarFallback>JS</AvatarFallback>
-                      </Avatar>
+                    <div className="flex items-start gap-6">
+                      {/* Avatar Box */}
+                      <div className="relative">
+                        <Avatar className="h-20 w-20 border-2 border-sky-700">
+                          <AvatarImage
+                            src={user.avatar || "/Surf.png"}
+                            className="object-fill"
+                          />
+                          <AvatarFallback>JS</AvatarFallback>
+                        </Avatar>
+
+                        {/* Tooltip Icon (Outside Avatar) */}
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="absolute -top-3 right-0 cursor-pointer">
+                              <Info className="w-4 h-4 text-sky-700" />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent className="text-[10px] bg-sky-100 text-sky-800 border-0 rounded-full p-2">
+                            Avatar can only be uploaded once every 30 days
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+
+                      {/* Upload Button & Note */}
                       <div className="space-y-2">
                         <Button
                           variant="outline"
-                          className="gap-2 hover:bg-[#0f67fe]/10 hover:text-sky-600 border-0 shadow-none"
+                          className="gap-2 hover:bg-[#0f67fe]/10 hover:text-sky-600 border-0 shadow-none cursor-pointer"
+                          onClick={() => fileInputRef.current?.click()}
                         >
                           <Camera className="h-4 w-4" />
                           Change Avatar
                         </Button>
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          className="hidden"
+                          multiple
+                          onChange={handleAvatarChange}
+                        />
                         <p className="text-sm text-gray-500">
                           JPG, PNG or GIF. Max size 2MB.
                         </p>
                       </div>
                     </div>
-
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="name">Full Name</Label>
                         <Input
                           id="name"
-                          value={profileData.name}
+                          value={user.name}
                           className="focus-visible:ring-0 focus-visible:border-sky-600"
                           onChange={(e) => {
-                            setProfileData({
-                              ...profileData,
+                            setUser({
+                              ...user,
                               name: e.target.value,
                             });
                             setUnsavedChanges(true);
@@ -272,11 +362,11 @@ export default function SettingsPage() {
                         <Input
                           id="email"
                           type="email"
-                          value={profileData.email}
+                          value={user.email}
                           className="focus-visible:ring-0 focus-visible:border-sky-600"
                           onChange={(e) => {
-                            setProfileData({
-                              ...profileData,
+                            setUser({
+                              ...user,
                               email: e.target.value,
                             });
                             setUnsavedChanges(true);
@@ -286,15 +376,14 @@ export default function SettingsPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="bio">Bio</Label>
+                      <Label htmlFor="email">Bio</Label>
                       <Textarea
                         id="bio"
-                        placeholder="Tell us about yourself..."
+                        value={user.bio}
                         className="focus-visible:ring-0 focus-visible:border-sky-600"
-                        value={profileData.bio}
                         onChange={(e) => {
-                          setProfileData({
-                            ...profileData,
+                          setUser({
+                            ...user,
                             bio: e.target.value,
                           });
                           setUnsavedChanges(true);
@@ -314,7 +403,8 @@ export default function SettingsPage() {
                       Manage your password and security settings.
                     </CardDescription>
                   </CardHeader>
-                  <Separator className="bg-[#0f67fe]" />
+                  <Separator className="bg-sky-700" />
+
                   <CardContent className="space-y-6">
                     <div className="space-y-4">
                       <div className="space-y-2">
@@ -443,7 +533,7 @@ export default function SettingsPage() {
                       updates.
                     </CardDescription>
                   </CardHeader>
-                  <Separator className="bg-[#0f67fe]" />
+                  <Separator className="bg-sky-700" />
                   <CardContent className="space-y-6">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
@@ -569,7 +659,7 @@ export default function SettingsPage() {
                       Control your privacy and data sharing preferences.
                     </CardDescription>
                   </CardHeader>
-                  <Separator className="bg-[#0f67fe]" />
+                  <Separator className="bg-sky-700" />
                   <CardContent className="space-y-6">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
@@ -645,6 +735,7 @@ export default function SettingsPage() {
                           variant="destructive"
                           size="sm"
                           className="gap-2 mt-3"
+                          onClick={handleDeleteData}
                         >
                           <Trash2 className="h-4 w-4" />
                           Delete Account
@@ -664,7 +755,7 @@ export default function SettingsPage() {
                       View your recent account activity and security events.
                     </CardDescription>
                   </CardHeader>
-                  <Separator className="bg-[#0f67fe]" />
+                  <Separator className="bg-sky-700" />
                   <CardContent className="space-y-0">
                     {activityLogs.map((log) => (
                       <div

@@ -57,7 +57,7 @@ export default function Toolbar({
 
   return (
     <MotionConfig transition={transition}>
-      <div ref={containerRef} className="bg-sky-100 rounded-4xl">
+      <div ref={containerRef} className="bg-transparent rounded-4xl">
         <div className={`h-full w-full rounded-xl border-sky-950/10`}>
           <motion.div
             animate={{ width: isOpen ? "100%" : "44px" }}

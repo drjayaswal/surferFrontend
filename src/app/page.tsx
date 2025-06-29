@@ -59,8 +59,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-full bg-white relative overflow-visible">
-      <WaveBackground opacity={0.2} />
+    <div className="min-h-full relative overflow-visible">
       <Navigation />
       <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative">
         <div className="max-w-7xl mx-auto">

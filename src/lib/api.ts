@@ -11,6 +11,12 @@ interface GenerateOtpPayload {
   email: string;
 }
 
+interface uploadProfilePicPayload {
+  file: File;
+}
+interface uploadCorpusPayload {
+  files: File[];
+}
 interface LoginPayload {
   email: string;
   password: string;
@@ -40,12 +46,18 @@ class ApiClient {
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     try {
+      const isFormData = options.body instanceof FormData;
+
+      const headers: HeadersInit = isFormData
+        ? { ...options.headers } // Let browser set Content-Type with boundary
+        : {
+            "Content-Type": "application/json",
+            ...options.headers,
+          };
+
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-          ...options.headers,
-        },
+        headers,
         ...options,
       });
 
@@ -60,14 +72,38 @@ class ApiClient {
       };
     }
   }
-
   async generateOtp(payload: GenerateOtpPayload): Promise<ApiResponse> {
     return this.request("/auth/generate-otp", {
       method: "POST",
       body: JSON.stringify(payload),
     });
   }
+  async getUserData(): Promise<ApiResponse> {
+    return this.request("/user/data?credentials=true", {
+      method: "get",
+    });
+  }
+  async uploadProfilePic(
+    payload: uploadProfilePicPayload
+  ): Promise<ApiResponse> {
+    const formData = new FormData();
+    formData.append("file", payload.file);
+    return this.request("/upload/avatar", {
+      method: "POST",
+      body: formData,
+    });
+  }
 
+  async uploadCorpuses(payload: uploadCorpusPayload): Promise<ApiResponse> {
+    const formData = new FormData();
+    for (const file of payload.files) {
+      formData.append("files", file);
+    }
+    return this.request("/upload/corpuses", {
+      method: "POST",
+      body: formData,
+    });
+  }
   async login(payload: LoginPayload): Promise<ApiResponse> {
     return this.request("/auth/login", {
       method: "POST",

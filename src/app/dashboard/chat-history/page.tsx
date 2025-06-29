@@ -539,7 +539,7 @@ export default function ChatHistoryPage() {
                 >
                   {message.role === "assistant" && (
                     <Avatar className="h-8 w-8 mt-1 shadow-sm">
-                      <AvatarImage src="/placeholder.svg?height=32&width=32" />
+                      <AvatarImage src="/Surf.png" />
                       <AvatarFallback className="bg-sky-100 text-sky-600 font-semibold">
                         AI
                       </AvatarFallback>
@@ -571,7 +571,7 @@ export default function ChatHistoryPage() {
 
                   {message.role === "user" && (
                     <Avatar className="h-8 w-8 mt-1 shadow-sm">
-                      <AvatarImage src="/placeholder.svg?height=32&width=32" />
+                      <AvatarImage src="/Surf.png" />
                       <AvatarFallback className="bg-blue-100 text-blue-600 font-semibold">
                         <User className="h-4 w-4" />
                       </AvatarFallback>

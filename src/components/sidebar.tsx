@@ -64,12 +64,12 @@ const navigationData = {
   user: {
     name: "John Doe",
     email: "john.doe@example.com",
-    avatar: "/placeholder.svg?height=32&width=32",
+    avatar: "/Surf.png",
     initials: "JD",
   },
   brand: {
     name: "Surfer",
-    logo: "/placeholder.svg?height=32&width=32",
+    logo: "/Surf.png",
   },
   mainNavigation: [
     {

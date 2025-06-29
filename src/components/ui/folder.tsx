@@ -154,9 +154,7 @@ const Folders: React.FC<FolderProps> = ({
                 }}
               >
                 <span className="flex items-center justify-center my-5">
-                  {typeof item === "object" && "name" in item
-                    ? item.name.split(".")[0].slice(0, 5)
-                    : String(item)}
+                  {i+1}
                 </span>
               </div>
             );
