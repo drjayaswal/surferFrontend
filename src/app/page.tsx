@@ -3,12 +3,10 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowDown, Shapes } from "lucide-react";
+import { Shapes } from "lucide-react";
 import Link from "next/link";
-import WaveBackground from "@/components/waveBackground";
 import Navigation from "@/components/navigation";
 import PremiumSearchBar from "@/components/searchBar";
-import InteractiveAIPlayground from "@/components/playground";
 import Footer from "@/components/footer";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";

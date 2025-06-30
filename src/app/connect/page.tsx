@@ -2,44 +2,18 @@
 
 import type React from "react";
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import {
   Mail,
   Phone,
   MapPin,
   Clock,
-  Send,
-  Sparkles,
   MessageSquare,
   Users,
   Briefcase,
   Code,
-  Zap,
-  CheckCircle,
-  Bot,
-  Calendar,
-  Coffee,
-  ArrowRight,
-  Star,
-  Info,
   Handshake,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import LoginNavigation from "@/components/loginNavigation";
-import WaveBackground from "@/components/waveBackground";
 import Footer from "@/components/footer";
 import ReportIssueForm from "@/components/report-form";
 
@@ -230,10 +204,6 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen relative z-10 bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
-      {/* Animated Wave Background */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <WaveBackground opacity={0.2} />
-      </div>
       <LoginNavigation />
       {/* Hero Section */}
 

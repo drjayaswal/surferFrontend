@@ -16,10 +16,13 @@ export const useHydrateUser = () => {
   const setAuthChecked = userStore((s) => s.setAuthChecked);
 
   useEffect(() => {
+    console.log("hydrated:", hasHydrated); // 🧪 debug
+    console.log("userStore.user:", user); // 🧪 debug
     if (!hasHydrated) return;
 
     const fetchUser = async () => {
       if (user) {
+        console.log("User already exists in store");
         setLoading(false);
         setAuthChecked(true);
         return;
@@ -29,12 +32,8 @@ export const useHydrateUser = () => {
       try {
         const response = await apiClient.getUserData();
         if (response.success && response.data) {
-          const base64Avatar = localStorage.getItem("user-avatar");
-          if (base64Avatar) {
-            setUser({ ...response.data, avatar: base64Avatar });
-          } else {
-            setUser(response.data);
-          }
+          console.log("✅ fetched from API:", response.data);
+          setUser(response.data);
         } else {
           setUser(null);
         }
@@ -48,5 +47,5 @@ export const useHydrateUser = () => {
     };
 
     fetchUser();
-  }, [hasHydrated]);
+  }, [hasHydrated, user]);
 };

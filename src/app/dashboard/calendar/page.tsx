@@ -1,31 +1,23 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
   ChevronLeft,
   ChevronRight,
-  MessageSquare,
-  Search,
   CalendarIcon,
-  Clock,
-  Send,
-  Mic,
-  MicOff,
-  Loader2,
-  Sparkles,
-  MoreHorizontal,
   Eye,
+  EyeClosed,
+  EyeOff,
+  MousePointerClickIcon,
+  SearchCheckIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -34,29 +26,36 @@ import {
   TooltipContent,
 } from "@radix-ui/react-tooltip";
 import { Morphe } from "@/components/ui/notes";
+import { monthNames } from "@/lib/const";
+import { useHydrateUser } from "@/hooks/useHydrateUser";
+import { userStore } from "@/stores/userStore";
+import { DayData, Note, SearchQuery } from "@/types/app.types";
+import { NotesModal } from "./component/noteModal";
 
-interface SearchQuery {
-  id: string;
-  query: string;
-  timestamp: Date;
-  response?: string;
-  category?: string;
-}
-
-interface DayData {
-  date: Date;
-  queries: SearchQuery[];
-  isToday: boolean;
-  isCurrentMonth: boolean;
-}
 
 export default function CalendarPage() {
+  useHydrateUser();
+
+  const user = userStore((s) => s.user);
+  const loading = userStore((s) => s.loading);
+  const setUser = userStore((s) => s.setUser);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState<DayData | null>(null);
   const [showDayDialog, setShowDayDialog] = useState(false);
-  const [searchFilter, setSearchFilter] = useState("");
+  const [visible, setVisible] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const handleToggle = () => setVisible((prev) => !prev);
 
-  // Sample data - in a real app, this would come from your backend
+  // Assuming Note type is defined elsewhere, or import it if needed
+  const [notes, setNotes] = useState<Note[]>([]);
+
+  useEffect(() => {
+    if (user?.notes) {
+      setNotes(user.notes);
+    }
+  }, [user]);
+
   const [searchQueries] = useState<SearchQuery[]>([
     {
       id: "1",
@@ -197,44 +196,9 @@ export default function CalendarPage() {
     setShowDayDialog(true);
   };
 
-  const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   const days = getDaysInMonth(currentDate);
-
-  const getCategoryColor = (category?: string) => {
-    const colors = {
-      Development: "bg-blue-100 text-blue-700 border-blue-200",
-      Management: "bg-green-100 text-green-700 border-green-200",
-      "AI/ML": "bg-purple-100 text-purple-700 border-purple-200",
-      Database: "bg-orange-100 text-orange-700 border-orange-200",
-      Design: "bg-pink-100 text-pink-700 border-pink-200",
-      Cloud: "bg-sky-100 text-sky-700 border-sky-200",
-      Security: "bg-red-100 text-red-700 border-red-200",
-    };
-    return (
-      colors[category as keyof typeof colors] ||
-      "bg-gray-100 text-gray-700 border-gray-200"
-    );
-  };
-
-  const filteredQueries = selectedDay?.queries.filter((query) =>
-    query.query.toLowerCase().includes(searchFilter.toLowerCase())
-  );
 
   return (
     <div className="flex flex-col h-full bg-white">
@@ -284,10 +248,12 @@ export default function CalendarPage() {
               <Card
                 key={index}
                 className={cn(
-                  "min-h-[108px] p-2 cursor-pointer transition-all duration-200 hover:shadow-md",
-                  dayData.isCurrentMonth ? "bg-white" : "-z-10",
-                  dayData.isToday && "ring-0 ring-sky-500 bg-sky-50",
-                  dayData.queries.length > 0 && "border-sky-200 bg-sky-50/50"
+                  "min-h-[108px] p-2 cursor-pointer transition-all shadow-xs border-transparent border-2 duration-200",
+                  dayData.isCurrentMonth ? "bg-white hover:shadow-md" : "-z-10",
+                  dayData.isToday &&
+                    "border-transparent bg-sky-500/50 shadow-xl hover:shadow-xl",
+                  dayData.queries.length > 0 &&
+                    "border-transparent hover:shadow-none shadow-none bg-sky-500/10"
                 )}
                 onClick={() => handleDayClick(dayData)}
               >
@@ -299,7 +265,7 @@ export default function CalendarPage() {
                         dayData.isCurrentMonth
                           ? "text-gray-800"
                           : "text-gray-400",
-                        dayData.isToday && "text-sky-700 font-semibold"
+                        dayData.isToday && "text-white font-semibold"
                       )}
                     >
                       {dayData.date.getDate()}
@@ -310,9 +276,9 @@ export default function CalendarPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 w-8 p-0 text-gray-500 hover:text-sky-700 hover:bg-sky-600/10 cursor-grab active:cursor-grabbing"
+                            className="h-8 w-8 p-0 text-sky-500 hover:text-sky-700 hover:bg-sky-600/10 cursor-grab active:cursor-grabbing"
                           >
-                            <Eye className="h-4 w-4" />
+                            <SearchCheckIcon className="h-4 w-4" />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent
@@ -328,15 +294,27 @@ export default function CalendarPage() {
               </Card>
             ))}
           </div>
-          <div className="absolute bottom-40 left-[47vw]">
+          <div className="absolute bottom-40 left-[47vw] flex items-center justify-center gap-3">
             <Morphe />
+            {notes.length > 0 && (
+              <>
+                <Button
+                  className="hover:bg-sky-700 text-white bg-sky-500/70 px-3 hover:text-white cursor-pointer border-0 rounded-3xl"
+                  onClick={() => setModalOpen(true)}
+                >
+                  View Notes
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>
 
+      <NotesModal open={modalOpen} setOpen={setModalOpen} notes={notes} />
+
       {/* Day Details Dialog */}
       <Dialog open={showDayDialog} onOpenChange={setShowDayDialog}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogContent className="max-w-sm max-h-[80vh] overflow-hidden focus-visible:ring-0 flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <CalendarIcon className="h-5 w-5 text-sky-500" />
@@ -346,52 +324,25 @@ export default function CalendarPage() {
                 month: "long",
                 day: "numeric",
               })}
-            </DialogTitle>
-            <DialogDescription>
               {selectedDay?.queries.length
-                ? `${selectedDay?.queries.length} search queries on this day`
-                : ""}
-            </DialogDescription>
+                ? ` with ${selectedDay?.queries.length} searches`
+                : " has no searches"}
+              {selectedDay?.queries.length! > 0 && (
+                <Button
+                  className="absolute top-3.5 right-7 text-sm focus-visible:ring-0 bg-transparent text-sky-700 rounded-4xl hover:bg-transparent shadow-none hover:text-sky-700 select-none cursor-pointer"
+                  onClick={handleToggle}
+                  onMouseEnter={() => setHovered(true)}
+                  onMouseLeave={() => setHovered(false)}
+                >
+                  {hovered ? (
+                    <Eye className="size-7 transition-all duration-150" />
+                  ) : (
+                    <EyeClosed className="size-7 transition-all duration-150" />
+                  )}
+                </Button>
+              )}
+            </DialogTitle>
           </DialogHeader>
-
-          {selectedDay && selectedDay.queries.length > 0 && (
-            <>
-              {/* Queries List */}
-              <div className="flex-1 overflow-y-auto space-y-3">
-                {filteredQueries?.map((query) => (
-                  <Card
-                    key={query.id}
-                    className="p-4 hover:shadow-md transition-all duration-200"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <h3 className="font-medium text-gray-800 truncate">
-                        {query.query.slice(0, 25)}
-                        {query.query.length > 25 && "..."}
-                      </h3>
-                      <div className="flex justify-center text-sm items-center gap-2">
-                        <Clock className="h-3 w-3" />
-                        {query.timestamp.toLocaleTimeString()}
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-
-                {filteredQueries?.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
-                    <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>No queries match your search</p>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-
-          {selectedDay && selectedDay.queries.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>No search queries on this day</p>
-            </div>
-          )}
         </DialogContent>
       </Dialog>
     </div>

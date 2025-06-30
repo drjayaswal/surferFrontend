@@ -18,7 +18,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import {
   User,
-  Bell,
   Shield,
   Download,
   Upload,
@@ -26,21 +25,17 @@ import {
   EyeOff,
   Trash2,
   Settings,
-  Mail,
   Smartphone,
   Lock,
   Key,
   Activity,
-  FileText,
   AlertTriangle,
   CheckCircle,
   Info,
   Camera,
-  Zap,
   Loader2,
-  MessageCircleQuestion,
 } from "lucide-react";
-import { cn, toBase64 } from "@/lib/utils";
+import { cn, formatTime, generateApiKey, toBase64 } from "@/lib/utils";
 import { ActivityLog } from "@/types/app.types";
 import { apiClient } from "@/lib/api";
 import { toast } from "sonner";
@@ -48,7 +43,7 @@ import { userStore } from "@/stores/userStore";
 import { useHydrateUser } from "@/hooks/useHydrateUser";
 import { Tooltip } from "@/components/ui/tooltip";
 import { TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip";
-import { usePathname, useRouter } from "next/navigation";
+import { COOLDOWN_MS } from "@/lib/const";
 
 export default function SettingsPage() {
   useHydrateUser();
@@ -59,36 +54,27 @@ export default function SettingsPage() {
   const authChecked = userStore((s) => s.authChecked);
   const [showPassword, setShowPassword] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
-  const [activeTab, setActiveTab] = useState("profile");
+  const [activeTab, setActiveTab] = useState("");
   const [unsavedChanges, setUnsavedChanges] = useState(false);
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [apiKey, setApiKey] = useState("");
+  const lastGeneratedTimeRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [siteSettings, setSiteSettings] = useState({
-    siteName: "Surfer AI",
-    siteDescription:
-      "Your intelligent AI assistant for productivity and creativity",
-    primaryColor: "#3B82F6",
-    secondaryColor: "#0EA5E9",
-    logo: "/Surf.png",
-    favicon: "/favicon.ico",
-  });
-
-  const [notifications, setNotifications] = useState({
-    emailNotifications: true,
-    pushNotifications: false,
-    weeklyReports: true,
-    securityAlerts: true,
-    marketingEmails: false,
-    usageAlerts: true,
-  });
-
+  const [isGenerating, setIsGenerating] = useState(false);
   const [privacy, setPrivacy] = useState({
     profileVisibility: "private",
     dataSharing: false,
-    analyticsTracking: true,
-    cookieConsent: true,
+    analyticsTracking: false,
   });
-
+  useEffect(() => {
+    const saved = localStorage.getItem("active-settings-tab");
+    if (saved) setActiveTab(saved);
+  }, []);
+  useEffect(() => {
+    localStorage.setItem("active-settings-tab", activeTab);
+  }, [activeTab]);
   if (!user || loading || !authChecked) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -121,7 +107,6 @@ export default function SettingsPage() {
       return;
     }
 
-
     const toastId = toast.loading("Uploading Avatar...");
     try {
       const response = await apiClient.uploadProfilePic({ file });
@@ -136,7 +121,7 @@ export default function SettingsPage() {
         if (user) {
           setUser({ ...user, avatar: base64 });
         }
-    
+
         toast.dismiss(toastId);
         toast.success("Avatar Uploaded!");
       } else {
@@ -179,16 +164,9 @@ export default function SettingsPage() {
     },
   ];
 
-  const handleSave = () => {
-    setUnsavedChanges(false);
-    // Simulate save logic here
-  };
-
   const handleExportData = () => {
     const data = {
       profile: user,
-      settings: siteSettings,
-      notifications,
       privacy,
       exportDate: new Date().toISOString(),
     };
@@ -204,15 +182,54 @@ export default function SettingsPage() {
     a.click();
   };
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleString();
-  };
-
   const handleDeleteData = async () => {
-    localStorage.removeItem("surfer");
+    // localStorage.removeItem("surfer");
     toast("Your Account is Successfully Deleted!");
   };
+  const updatePassword = async () => {
+    const toastId = toast.loading("Updating Password...");
+    try {
+      const response = await apiClient.updatePassword({
+        old_password: oldPassword,
+        new_password: newPassword,
+        confirm_new_password: confirmNewPassword,
+      });
+      if (response.success) {
+        toast.dismiss(toastId);
+        toast.success("Password Updated!");
+      } else {
+        toast.error(response.message || "Failed to update password");
+        toast.dismiss(toastId);
+      }
+    } catch (error) {
+      console.log(`${error}`);
+    }
+  };
+  const generateKey = async () => {
+    setIsGenerating(true);
+    const now = Date.now();
 
+    if (
+      lastGeneratedTimeRef.current &&
+      now - lastGeneratedTimeRef.current < COOLDOWN_MS
+    ) {
+      toast.warning("Please wait before generating another key.");
+      setIsGenerating(false);
+      return;
+    }
+
+    lastGeneratedTimeRef.current = now;
+
+    const toastId = toast.loading("Generating API key...");
+    setTimeout(() => {
+      const key = generateApiKey();
+      setApiKey(key);
+      setShowApiKey(true);
+      toast.dismiss(toastId);
+      toast.success("API key is generated!");
+      setIsGenerating(false);
+    }, 5000);
+  };
   return (
     <div className="min-h-full bg-white">
       {/* Header */}
@@ -244,11 +261,6 @@ export default function SettingsPage() {
                       id: "account",
                       label: "Account",
                       icon: <Settings className="h-4 w-4" />,
-                    },
-                    {
-                      id: "notifications",
-                      label: "Notifications",
-                      icon: <Bell className="h-4 w-4" />,
                     },
                     {
                       id: "privacy",
@@ -404,8 +416,8 @@ export default function SettingsPage() {
                     </CardDescription>
                   </CardHeader>
                   <Separator className="bg-sky-700" />
-
                   <CardContent className="space-y-6">
+                    {/* Password Update Section */}
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="current-password">
@@ -415,14 +427,16 @@ export default function SettingsPage() {
                           <Input
                             id="current-password"
                             type={showPassword ? "text" : "password"}
-                            className="focus-visible:ring-0 focus-visible:border-sky-600"
-                            placeholder="Enter current password "
+                            value={oldPassword}
+                            onChange={(e) => setOldPassword(e.target.value)}
+                            className="focus-visible:ring-0 focus-visible:border-sky-600 pr-10"
+                            placeholder="Enter current password"
                           />
                           <Button
                             type="button"
                             variant="ghost"
                             size="sm"
-                            className="absolute right-2 top-1/2 -translate-y-1/2"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 hover:bg-transparent cursor-pointer"
                             onClick={() => setShowPassword(!showPassword)}
                           >
                             {showPassword ? (
@@ -440,6 +454,8 @@ export default function SettingsPage() {
                           <Input
                             id="new-password"
                             type="password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
                             className="focus-visible:ring-0 focus-visible:border-sky-600"
                             placeholder="Enter new password"
                           />
@@ -451,18 +467,31 @@ export default function SettingsPage() {
                           <Input
                             id="confirm-password"
                             type="password"
-                            placeholder="Confirm new password"
+                            value={confirmNewPassword}
+                            onChange={(e) =>
+                              setConfirmNewPassword(e.target.value)
+                            }
                             className="focus-visible:ring-0 focus-visible:border-sky-600"
+                            placeholder="Confirm new password"
                           />
                         </div>
                       </div>
 
-                      <Button className="gap-2 bg-sky-800 hover:bg-sky-900 cursor-not-allowed rounded-2xl">
+                      <Button
+                        className="gap-2 bg-sky-800 hover:bg-sky-900 rounded-2xl cursor-pointer"
+                        disabled={
+                          !oldPassword ||
+                          !newPassword ||
+                          newPassword !== confirmNewPassword
+                        }
+                        onClick={updatePassword}
+                      >
                         <Lock className="h-4 w-4" />
                         Update Password
                       </Button>
                     </div>
 
+                    {/* Two-Factor Authentication */}
                     <div className="space-y-4">
                       <h4 className="font-medium text-lg">
                         Two-Factor Authentication
@@ -473,32 +502,40 @@ export default function SettingsPage() {
                           <div>
                             <p className="font-medium">SMS Authentication</p>
                             <p className="text-sm text-gray-500">
-                              Receive codes via SMS
+                              Receive OTP via SMS
                             </p>
                           </div>
                         </div>
-                        <Switch className="data-[state=checked]:bg-[#0f67fe] data-[state=unchecked]:bg-[#0f67fe]/20" />
+                        <Switch className="data-[state=checked]:bg-[#0f67fe] data-[state=unchecked]:bg-[#0f67fe]/20 cursor-pointer" />
                       </div>
                     </div>
 
+                    {/* API Access */}
                     <div className="space-y-4">
-                      <h4 className="font-medium text-lg">API Access</h4>
+                      <h4 className="font-medium text-lg">Access Key</h4>
                       <div className="space-y-2">
-                        <Label htmlFor="api-key">API Key</Label>
                         <div className="flex gap-2">
                           <div className="relative flex-1">
                             <Input
                               id="api-key"
                               type={showApiKey ? "text" : "password"}
-                              value="sk-1234567890abcdef..."
+                              value={
+                                apiKey || "sfr-slick-neuron-a83kzjdf-20250630"
+                              }
+                              className={`focus-visible:ring-0  border-0 shadow-none cursor-text ${
+                                isGenerating && "bg-muted text-muted-foreground"
+                              }`}
+                              disabled={isGenerating}
                               readOnly
                             />
                             <Button
                               type="button"
                               variant="ghost"
                               size="sm"
-                              className="absolute right-2 top-1/2 -translate-y-1/2"
-                              onClick={() => setShowApiKey(!showApiKey)}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500 hover:bg-transparent cursor-pointer rounded-3xl"
+                              onClick={() => {
+                                if (apiKey != "") setShowApiKey(!showApiKey);
+                              }}
                             >
                               {showApiKey ? (
                                 <EyeOff className="h-4 w-4" />
@@ -509,141 +546,20 @@ export default function SettingsPage() {
                           </div>
                           <Button
                             variant="outline"
-                            className="gap-2 hover:bg-[#0f67fe]/10 hover:text-sky-600 border-0 shadow-none"
+                            className="gap-2 hover:bg-[#0f67fe]/10 hover:text-sky-600 border-0 shadow-none cursor-pointer"
+                            onClick={generateKey}
                           >
                             <Key className="h-4 w-4" />
                             Regenerate
                           </Button>
                         </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Notifications Tab */}
-              <TabsContent value="notifications">
-                <Card className="border-0 shadow-xl">
-                  <CardHeader>
-                    <CardTitle className="text-2xl">
-                      Notification Preferences
-                    </CardTitle>
-                    <CardDescription>
-                      Choose how you want to be notified about important
-                      updates.
-                    </CardDescription>
-                  </CardHeader>
-                  <Separator className="bg-sky-700" />
-                  <CardContent className="space-y-6">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Mail className="h-5 w-5 text-gray-500" />
-                          <div>
-                            <p className="font-medium">Email Notifications</p>
-                            <p className="text-sm text-gray-500">
-                              Receive notifications via email
-                            </p>
-                          </div>
-                        </div>
-                        <Switch
-                          checked={notifications.emailNotifications}
-                          className="data-[state=checked]:bg-[#0f67fe] data-[state=unchecked]:bg-[#0f67fe]/20"
-                          onCheckedChange={(checked) =>
-                            setNotifications({
-                              ...notifications,
-                              emailNotifications: checked,
-                            })
-                          }
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Smartphone className="h-5 w-5 text-gray-500" />
-                          <div>
-                            <p className="font-medium">Push Notifications</p>
-                            <p className="text-sm text-gray-500">
-                              Receive push notifications on your device
-                            </p>
-                          </div>
-                        </div>
-                        <Switch
-                          checked={notifications.pushNotifications}
-                          className="data-[state=checked]:bg-[#0f67fe] data-[state=unchecked]:bg-[#0f67fe]/20"
-                          onCheckedChange={(checked) =>
-                            setNotifications({
-                              ...notifications,
-                              pushNotifications: checked,
-                            })
-                          }
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <FileText className="h-5 w-5 text-gray-500" />
-                          <div>
-                            <p className="font-medium">Weekly Reports</p>
-                            <p className="text-sm text-gray-500">
-                              Get weekly usage and performance reports
-                            </p>
-                          </div>
-                        </div>
-                        <Switch
-                          checked={notifications.weeklyReports}
-                          className="data-[state=checked]:bg-[#0f67fe] data-[state=unchecked]:bg-[#0f67fe]/20"
-                          onCheckedChange={(checked) =>
-                            setNotifications({
-                              ...notifications,
-                              weeklyReports: checked,
-                            })
-                          }
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Shield className="h-5 w-5 text-gray-500" />
-                          <div>
-                            <p className="font-medium">Security Alerts</p>
-                            <p className="text-sm text-gray-500">
-                              Important security notifications
-                            </p>
-                          </div>
-                        </div>
-                        <Switch
-                          checked={notifications.securityAlerts}
-                          className="data-[state=checked]:bg-[#0f67fe] data-[state=unchecked]:bg-[#0f67fe]/20"
-                          onCheckedChange={(checked) =>
-                            setNotifications({
-                              ...notifications,
-                              securityAlerts: checked,
-                            })
-                          }
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Zap className="h-5 w-5 text-gray-500" />
-                          <div>
-                            <p className="font-medium">Usage Alerts</p>
-                            <p className="text-sm text-gray-500">
-                              Notifications when approaching usage limits
-                            </p>
-                          </div>
-                        </div>
-                        <Switch
-                          checked={notifications.usageAlerts}
-                          className="data-[state=checked]:bg-[#0f67fe] data-[state=unchecked]:bg-[#0f67fe]/20"
-                          onCheckedChange={(checked) =>
-                            setNotifications({
-                              ...notifications,
-                              usageAlerts: checked,
-                            })
-                          }
-                        />
+                        {apiKey != "" && (
+                          <span className="text-xs text-zinc-500 flex items-center justify-center">
+                            ---------------------------- This API key will be
+                            hidden automatically after a short period for time
+                            ----------------------------
+                          </span>
+                        )}
                       </div>
                     </div>
                   </CardContent>
@@ -710,14 +626,14 @@ export default function SettingsPage() {
                         <Button
                           variant="outline"
                           onClick={handleExportData}
-                          className="gap-2 hover:bg-amber-600/10 hover:text-amber-600 border-0 shadow-none"
+                          className="gap-2 hover:bg-amber-600/10 hover:text-amber-600 border-0 shadow-none cursor-pointer"
                         >
                           <Upload className="h-4 w-4" />
                           Export Data
                         </Button>
                         <Button
                           variant="outline"
-                          className="gap-2 hover:bg-emerald-600/10 hover:text-emerald-600 border-0 shadow-none"
+                          className="gap-2 hover:bg-emerald-600/10 hover:text-emerald-600 border-0 shadow-none cursor-pointer"
                         >
                           <Download className="h-4 w-4" />
                           Import Data

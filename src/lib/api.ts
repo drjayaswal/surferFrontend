@@ -17,6 +17,14 @@ interface uploadProfilePicPayload {
 interface uploadCorpusPayload {
   files: File[];
 }
+interface updatePasswordPayload {
+  old_password: string;
+  new_password: string;
+  confirm_new_password: string;
+}
+interface uploadNotePayload {
+  content: string;
+}
 interface LoginPayload {
   email: string;
   password: string;
@@ -93,6 +101,15 @@ class ApiClient {
       body: formData,
     });
   }
+  async uploadNote(payload: uploadNotePayload): Promise<ApiResponse> {
+    return this.request("/upload/note", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+  }
 
   async uploadCorpuses(payload: uploadCorpusPayload): Promise<ApiResponse> {
     const formData = new FormData();
@@ -102,6 +119,15 @@ class ApiClient {
     return this.request("/upload/corpuses", {
       method: "POST",
       body: formData,
+    });
+  }
+  async updatePassword(payload: updatePasswordPayload): Promise<ApiResponse> {
+    return this.request("/user/update-password", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
     });
   }
   async login(payload: LoginPayload): Promise<ApiResponse> {

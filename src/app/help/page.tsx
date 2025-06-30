@@ -1,25 +1,12 @@
 import Footer from "@/components/footer";
 import LoginNavigation from "@/components/loginNavigation";
 import ReportIssueForm from "@/components/report-form";
-import WaveBackground from "@/components/waveBackground";
-import {
-  Bot,
-  LifeBuoy,
-  Sparkles,
-  BrainCircuit,
-  HelpCircleIcon,
-  Info,
-  HelpingHand,
-} from "lucide-react";
+import { HelpingHand } from "lucide-react";
 
 export default function ReportIssuePage() {
   return (
     <div className="min-h-full relative z-10 bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
       <div>
-        {/* Animated Wave Background */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <WaveBackground opacity={0.2} />
-        </div>
         <div className="pb-20">
           <LoginNavigation />
         </div>

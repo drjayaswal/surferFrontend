@@ -1,7 +1,6 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/sidebar";
 import SidebarToggleButton from "@/components/sidebarToggleButton";
-import WaveBackground from "@/components/waveBackground";
 import { SurferDock } from "@/components/ui/surferDock";
 
 export default function DashboardLayout({

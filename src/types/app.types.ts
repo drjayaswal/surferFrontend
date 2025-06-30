@@ -9,6 +9,25 @@ export interface CorpusFile {
   size: number;
   created_at: Date;
 }
+export interface Note {
+  id: string;
+  content: string;
+  created_at: Date;
+}
+export interface SearchQuery {
+  id: string;
+  query: string;
+  timestamp: Date;
+  response?: string;
+  category?: string;
+}
+
+export interface DayData {
+  date: Date;
+  queries: SearchQuery[];
+  isToday: boolean;
+  isCurrentMonth: boolean;
+}
 export type ToolbarProps = {
   icon: React.ReactNode;
   rightIcon?: React.ReactNode; // <-- Add this
