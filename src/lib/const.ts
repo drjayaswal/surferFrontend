@@ -1,3 +1,4 @@
+export const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export const COOLDOWN_MS = 1000 * 60;
 export const UNPROTECTED_ROUTES = [
   "/",

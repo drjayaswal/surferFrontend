@@ -1,33 +1,6 @@
-import { CorpusFile, Note } from "@/types/app.types";
+import { UserState } from "@/types/app.types";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar: string;
-  avatar_uploaded_at: string;
-  bio: string;
-  refresh_token?: string;
-  corpuses: CorpusFile[];
-  notes: Note[];
-  created_at?: string;
-}
-
-interface UserState {
-  user: User | null;
-  setUser: (user: User | null) => void;
-
-  authChecked: boolean;
-  setAuthChecked: (checked: boolean) => void;
-
-  loading: boolean;
-  setLoading: (loading: boolean) => void;
-
-  _hasHydrated: boolean;
-  setHasHydrated: (state: boolean) => void;
-}
 
 export const userStore = create<UserState>()(
   persist(
@@ -45,14 +18,14 @@ export const userStore = create<UserState>()(
       setHasHydrated: (state) => set({ _hasHydrated: state }),
     }),
     {
-      name: "surfer", // key in localStorage
+      name: "surfer",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         user: state.user,
+        authChecked: state.authChecked,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true);
-        console.log("✅ Zustand has hydrated");
       },
     }
   )

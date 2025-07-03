@@ -23,12 +23,6 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
 }) => {
   if (!file) return null;
 
-  const isSupported =
-    file.mime.includes("pdf") ||
-    file.mime.includes("word") ||
-    file.mime.includes("text") ||
-    file.mime.includes("document");
-
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent
@@ -41,17 +35,11 @@ export const DocumentPreviewModal: React.FC<DocumentPreviewModalProps> = ({
           <DialogTitle>{file.name}</DialogTitle>
         </VisuallyHidden>
         <div className="w-full h-full">
-          {isSupported ? (
-            <iframe
-              src={file.url}
-              title={file.name}
-              className="w-full h-full border-none rounded-md"
-            />
-          ) : (
-            <div className="h-full w-full flex items-center justify-center text-white text-sm px-4">
-              Preview not supported for this document. Please download instead.
-            </div>
-          )}
+          <iframe
+            src={file.url}
+            title={file.name}
+            className="w-full h-full border-none rounded-md"
+          />
         </div>{" "}
       </DialogContent>
     </Dialog>

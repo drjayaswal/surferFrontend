@@ -24,31 +24,28 @@ import {
   Tally1,
   EyeOff,
   Plus,
+  Loader2,
 } from "lucide-react";
 import Folders from "@/components/ui/folder";
-import { CorpusFile } from "@/types/app.types";
+import { CorpusFile, User } from "@/types/app.types";
 import Toolbar from "@/components/ui/toolbar";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/api";
-import { useHydrateUser } from "@/hooks/useHydrateUser";
-import { User, userStore } from "@/stores/userStore";
-import { toBase64 } from "@/lib/utils";
 import { DocumentPreviewModal } from "./components/documentViewer";
-
+import { openFileInNewTab, toBase64 } from "@/lib/utils";
+import { useHydration } from "@/hooks/useHydration";
+import { userStore } from "@/stores/userStore";
 
 export default function CorpusPage() {
-  useHydrateUser();
+  useHydration();
 
   const user = userStore((s) => s.user);
   const loading = userStore((s) => s.loading);
   const setUser = userStore((s) => s.setUser);
+  const authChecked = userStore((s) => s.authChecked);
+
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [files, setFiles] = useState<CorpusFile[]>([]);
-  const [previewFile, setPreviewFile] = useState<{
-    name: string;
-    url: string;
-    mime: string;
-  } | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -58,18 +55,11 @@ export default function CorpusPage() {
 
     const files = Array.from(inputFiles);
     if (files.length > 5) {
-      toast.error("Maximum five corpus files allowed!");
+      toast.error("Maximum five corpuses files allowed!");
       return;
     }
 
     const maxSize = 2 * 1024 * 1024;
-    const allowedTypes = [
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "text/plain",
-      "application/vnd.oasis.opendocument.text",
-    ];
 
     for (const file of files) {
       // if (!allowedTypes.includes(file.type)) {
@@ -89,26 +79,24 @@ export default function CorpusPage() {
 
       toast.dismiss(toastId);
 
-      if (response.success && Array.isArray(response.data)) {
-        // 🔄 Replace URLs with base64
+      if (response.success && Array.isArray(response.data.corpusesFiles)) {
         const enrichedCorpusData = await Promise.all(
           files.map(async (file, i) => {
             const base64 = await toBase64(file);
             return {
-              ...response.data[i],
+              ...response.data.corpusesFiles[i],
               url: base64,
             };
           })
         );
 
-        // ✅ Update Zustand store
         const updatedUser: User = {
           ...user!,
           corpuses: [...(user?.corpuses || []), ...enrichedCorpusData],
+          activity_logs: [...user?.activity_logs!, response.data.newActivity],
         };
         setUser(updatedUser);
 
-        // ✅ Persist in localStorage
         const surferRaw = localStorage.getItem("surfer");
         const surfer = surferRaw ? JSON.parse(surferRaw) : null;
 
@@ -132,37 +120,6 @@ export default function CorpusPage() {
     e.preventDefault();
   }, []);
 
-  const handleDeleteFile = (id: string) => {
-    setFiles((prev) => prev.filter((file) => file.id !== id));
-  };
-
-  const handleDownloadFile = (file: CorpusFile) => {
-    const link = document.createElement("a");
-    link.href = file.url;
-    link.download = file.name || "download";
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-  const getFileIcon = (fileType: string) => {
-    if (fileType.includes("pdf"))
-      return <FileText className="h-6 w-6 text-red-500" />;
-    if (fileType.includes("spreadsheet") || fileType.includes("csv"))
-      return <FileSpreadsheet className="h-6 w-6 text-green-600" />;
-    if (fileType.includes("image"))
-      return <FileImage className="h-6 w-6 text-purple-500" />;
-    if (fileType.includes("word") || fileType.includes("document"))
-      return <FileText className="h-6 w-6 text-blue-500" />;
-    return <File className="h-6 w-6 text-gray-500" />;
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + " B";
-    else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
-    else return (bytes / 1048576).toFixed(1) + " MB";
-  };
   useEffect(() => {
     const stored = userStore.getState().user?.corpuses || [];
     setFiles(stored);
@@ -179,11 +136,42 @@ export default function CorpusPage() {
       setFiles(filtered);
     }
   }, [searchQuery, user]);
+
   useEffect(() => {
     if (user?.corpuses?.length) {
       setFiles(user.corpuses);
     }
   }, [user]);
+
+  if (!authChecked) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="animate-spin w-6 h-6 text-sky-500" />
+        <p className="ml-2 text-sm text-gray-600">Authenticating...</p>
+      </div>
+    );
+  }
+
+  const handleDeleteFile = (id: string) => {
+    setFiles((prev) => prev.filter((file) => file.id !== id));
+  };
+
+  const handleDownloadFile = (file: CorpusFile) => {
+    const link = document.createElement("a");
+    link.href = file.url;
+    link.download = file.name || "download";
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + " B";
+    else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
+    else return (bytes / 1048576).toFixed(1) + " MB";
+  };
 
   return (
     <motion.div
@@ -191,7 +179,7 @@ export default function CorpusPage() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.75 }}
     >
       <div className="flex flex-col h-full bg-white">
         <div className="flex-1 overflow-hidden flex flex-col">
@@ -208,7 +196,7 @@ export default function CorpusPage() {
             <div className="flex items-center gap-3">
               <Button
                 size="sm"
-                className="gap-2 bg-sky-500 hover:bg-sky-600 text-white border-0 hover:shadow-lg hover:scale-102 shadow-none cursor-pointer"
+                className="gap-2 bg-sky-400 hover:bg-sky-500 text-white border-0 hover:shadow-lg hover:scale-102 shadow-none cursor-pointer rounded-lg"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <Paperclip className="h-4 w-4" />
@@ -270,21 +258,17 @@ export default function CorpusPage() {
                       {files.map((file, index) => (
                         <div
                           key={index}
-                          className="group flex items-center justify-between gap-4 w-full p-3 px-5 rounded-full border-0 hover:border-sky-600 bg-white shadow-none hover:shadow-md transition"
+                          className="group flex items-center justify-between gap-4 w-full p-3 px-5 rounded-full border-0 hover:border-sky-600 bg-white shadow-none transition"
                         >
                           {/* Left: Icon + Name + Status + Tags + Size */}
                           <div className="flex items-center gap-4 flex-1 min-w-0">
                             <div className="flex-shrink-0">{index + 1}</div>
-                            {/* File Icon */}
-                            <div className="flex-shrink-0">
-                              {getFileIcon(file.mime)}
-                            </div>
 
                             {/* File Info */}
                             <div className="flex items-center gap-3 truncate flex-wrap">
                               {/* Name */}
                               <h3 className="text-sm font-semibold text-gray-900 truncate">
-                                {file.name}
+                                {file.id}
                               </h3>
 
                               {/* File Size */}
@@ -299,41 +283,37 @@ export default function CorpusPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-8 w-8 p-0 text-gray-500 hover:text-sky-700 hover:bg-sky-600/10"
+                              className="h-8 w-8 p-0 cursor-pointer text-gray-500 hover:text-sky-700 hover:bg-sky-600/10"
                               onClick={() => {
-                                setHoveredIndex(index);
-                                setPreviewFile(file);
+                                openFileInNewTab(file.url, file.mime);
                               }}
                             >
-                              {hoveredIndex === index ? (
-                                <Eye className="h-4 w-4" />
-                              ) : (
-                                <EyeOff className="h-4 w-4" />
-                              )}
+                              <Eye className="h-4 w-4" />
                             </Button>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="h-8 w-8 p-0 text-gray-500 hover:text-gray-800 focus-visible:ring-0"
+                                  className="h-8 w-8 p-0 cursor-pointer text-gray-500 hover:text-gray-800 focus-visible:ring-0"
                                 >
                                   <MoreHorizontal className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem
+                                  className="cursor-pointer"
                                   onClick={() => handleDownloadFile(file)}
                                 >
                                   <Download className="h-4 w-4 mr-2" />
                                   Download
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                  className="text-red-600"
+                                  className="cursor-pointer"
                                   onClick={() => handleDeleteFile(file.id)}
                                 >
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Delete
+                                  <Trash2 className="h-4 w-4 mr-2 text-red-600" />
+                                  <span className="text-red-600">Delete</span>
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -347,14 +327,6 @@ export default function CorpusPage() {
             </div>
           </div>
         </div>
-        <DocumentPreviewModal
-          open={!!previewFile}
-          file={previewFile}
-          onClose={() => {
-            setPreviewFile(null);
-            setHoveredIndex(null);
-          }}
-        />
         {files.length > 0 && (
           <div
             style={{ position: "relative", bottom: "0" }}
@@ -364,12 +336,7 @@ export default function CorpusPage() {
               size={0.7}
               items={files}
               onItemClick={(index) => {
-                console.log(index + 1);
-                setPreviewFile({
-                  name: files[index].name,
-                  url: files[index].url,
-                  mime: files[index].mime,
-                });
+                openFileInNewTab(files[index].url, files[index].mime);
               }}
             />
           </div>

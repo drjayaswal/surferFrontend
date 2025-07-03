@@ -80,7 +80,7 @@ const navigationData = {
     },
     {
       title: "Corpus",
-      url: "/dashboard/corpus",
+      url: "/dashboard/corpuses",
       icon: FileCog,
       badge: null,
     },

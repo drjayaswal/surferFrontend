@@ -18,7 +18,7 @@ export function NotesModal({ open, setOpen, notes }: NotesModalProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-lg sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle className="text-xl">Your Notes</DialogTitle>
+          <DialogTitle className="text-xl">You have a total of {notes.length} Notes</DialogTitle>
         </DialogHeader>
         <ScrollArea className="max-h-[400px] space-y-3">
           {notes.length === 0 ? (

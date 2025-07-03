@@ -27,8 +27,8 @@ const Data = [
   },
   {
     title: "Corpus",
-    url: "/dashboard/corpus",
-    href: "/dashboard/corpus",
+    url: "/dashboard/corpuses",
+    href: "/dashboard/corpuses",
     icon: FileCog,
     badge: null,
   },
@@ -82,7 +82,7 @@ export function SurferDock() {
       <Dock className="items-end pb-3 cursor-pointer bg-white/80 backdrop-blur-md rounded-full">
         {Data.map((item, idx) => (
           <Link key={idx} href={item.href}>
-            <DockItem className="aspect-square rounded-full bg-sky-50/80 active:bg-sky-500">
+            <DockItem className="aspect-square rounded-full bg-sky-50/80 active:bg-sky-300">
               <DockLabel className="text-sky-700 bg-white/90 backdrop-blur-sm shadow-0 border-0 text-md">
                 {item.title}
               </DockLabel>

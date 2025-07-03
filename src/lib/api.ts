@@ -10,12 +10,22 @@ interface ApiResponse<T = any> {
 interface GenerateOtpPayload {
   email: string;
 }
-
+interface sendConnectionPayload {
+  prompt?: string;
+  attachments?: File[];
+}
 interface uploadProfilePicPayload {
   file: File;
 }
 interface uploadCorpusPayload {
   files: File[];
+}
+interface updateApiKeyPayload {
+  key: string;
+}
+interface updateProfilePayload {
+  name: string;
+  bio: string;
 }
 interface updatePasswordPayload {
   old_password: string;
@@ -101,6 +111,29 @@ class ApiClient {
       body: formData,
     });
   }
+  async sendConnection(payload: sendConnectionPayload): Promise<ApiResponse> {
+    const formData = new FormData();
+
+    if (payload.prompt) {
+      formData.append("prompt", payload.prompt);
+    }
+
+    if (payload.attachments?.length) {
+      for (const file of payload.attachments) {
+        formData.append("attachments", file);
+      }
+    }
+
+    return this.request("/connection/send", {
+      method: "POST",
+      body: formData,
+    });
+  }
+  async getConnections(): Promise<ApiResponse> {
+    return this.request("/user/connections", {
+      method: "GET",
+    });
+  }
   async uploadNote(payload: uploadNotePayload): Promise<ApiResponse> {
     return this.request("/upload/note", {
       method: "POST",
@@ -121,6 +154,23 @@ class ApiClient {
       body: formData,
     });
   }
+  async updateTFA(): Promise<ApiResponse> {
+    return this.request("/user/update-tfa", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }
+  async updateProfile(payload: updateProfilePayload): Promise<ApiResponse> {
+    return this.request("/user/update-profile", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+  }
   async updatePassword(payload: updatePasswordPayload): Promise<ApiResponse> {
     return this.request("/user/update-password", {
       method: "POST",
@@ -130,6 +180,16 @@ class ApiClient {
       body: JSON.stringify(payload),
     });
   }
+  async updateApiKey(payload: updateApiKeyPayload): Promise<ApiResponse> {
+    return this.request("/user/update-apikey", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+  }
+
   async login(payload: LoginPayload): Promise<ApiResponse> {
     return this.request("/auth/login", {
       method: "POST",
