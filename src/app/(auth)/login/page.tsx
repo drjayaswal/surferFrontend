@@ -718,7 +718,7 @@ export default function AnimatedAuthPage(): ReactElement {
                     />
                     <button
                       type="button"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-sky-600 hover:text-sky-700"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-sky-600 hover:text-sky-700 cursor-pointer"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
@@ -765,7 +765,7 @@ export default function AnimatedAuthPage(): ReactElement {
                     <Checkbox
                       id="remember"
                       checked={formData.rememberMe}
-                      className="data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600"
+                      className="data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600 cursor-pointer"
                       onCheckedChange={(checked) =>
                         handleInputChange("rememberMe", checked as boolean)
                       }
@@ -777,7 +777,7 @@ export default function AnimatedAuthPage(): ReactElement {
                   <button
                     type="button"
                     onClick={() => goToStep("forgot-password", 1)}
-                    className="text-sm text-sky-600 hover:text-sky-700 font-medium"
+                    className="text-sm text-sky-600 hover:text-sky-700 font-medium cursor-pointer"
                   >
                     Forgot Password?
                   </button>
@@ -908,7 +908,7 @@ export default function AnimatedAuthPage(): ReactElement {
                       />
                       <button
                         type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-sky-600 hover:text-sky-700"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-sky-600 hover:text-sky-700 cursor-pointer"
                         onClick={() => setShowPassword(!showPassword)}
                       >
                         {showPassword ? (
@@ -940,7 +940,7 @@ export default function AnimatedAuthPage(): ReactElement {
                       />
                       <button
                         type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-sky-600 hover:text-sky-700"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-sky-600 hover:text-sky-700 cursor-pointer"
                         onClick={() =>
                           setShowConfirmPassword(!showConfirmPassword)
                         }
@@ -984,7 +984,8 @@ export default function AnimatedAuthPage(): ReactElement {
                 >
                   <Checkbox
                     id="terms"
-                    className="mt-1 data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600"
+                    className="mt-1 data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600 cursor-pointer"
+                    required
                   />
                   <Label
                     htmlFor="terms"
@@ -1016,7 +1017,7 @@ export default function AnimatedAuthPage(): ReactElement {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full h-12 bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                    className="w-full h-12 bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
                   >
                     {isLoading ? (
                       <>
@@ -1102,7 +1103,7 @@ export default function AnimatedAuthPage(): ReactElement {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-12 bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="w-full h-12 bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
                 >
                   {isLoading ? (
                     <>
@@ -1190,7 +1191,7 @@ export default function AnimatedAuthPage(): ReactElement {
                   disabled={
                     isLoading || !formData.otp || formData.otp.length !== 5
                   }
-                  className="w-full h-12 bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="w-full h-12 bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
                 >
                   {isLoading ? (
                     <>
@@ -1221,7 +1222,7 @@ export default function AnimatedAuthPage(): ReactElement {
                     }
                   }}
                   disabled={isLoading}
-                  className="flex-1 h-12 border-sky-200 bg-sky-50 hover:bg-sky-100 text-sky-600 rounded-xl transition-all duration-200"
+                  className="flex-1 h-12 border-0 bg-transparent hover:bg-sky-50 hover:text-sky-600 text-sky-600 rounded-xl transition-all duration-200 cursor-pointer"
                 >
                   Resend Code
                 </Button>
@@ -1330,10 +1331,9 @@ export default function AnimatedAuthPage(): ReactElement {
                       ref={loginRef}
                       onClick={() => handleTabSwitch("login")}
                       className={cn(
-                        "relative z-10 flex-1 py-3 text-sm font-semibold rounded-xl transition-colors duration-200",
-                        activeTab === "login"
-                          ? "text-sky-600"
-                          : "text-gray-600 hover:text-sky-500"
+                        "relative z-10 flex-1 py-3 text-sm font-semibold rounded-xl transition-colors duration-200 text-sky-600",
+                        activeTab !== "login" &&
+                          "hover:text-sky-500 cursor-pointer"
                       )}
                     >
                       Login
@@ -1342,10 +1342,9 @@ export default function AnimatedAuthPage(): ReactElement {
                       ref={signupRef}
                       onClick={() => handleTabSwitch("signup")}
                       className={cn(
-                        "relative z-10 flex-1 py-3 text-sm font-semibold rounded-xl transition-colors duration-200",
-                        activeTab === "signup"
-                          ? "text-sky-600"
-                          : "text-gray-600 hover:text-sky-500"
+                        "relative z-10 flex-1 py-3 text-sm font-semibold rounded-xl transition-colors duration-200 text-sky-600",
+                        activeTab !== "signup" &&
+                          "hover:text-sky-500 cursor-pointer"
                       )}
                     >
                       Sign Up
@@ -1366,7 +1365,7 @@ export default function AnimatedAuthPage(): ReactElement {
               {/* Back Button - Show when not on initial step and not success */}
               {authStep !== "initial" && authStep !== "success" && (
                 <motion.div
-                  className="mt-6 flex justify-center"
+                  className="flex justify-center"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
@@ -1375,7 +1374,7 @@ export default function AnimatedAuthPage(): ReactElement {
                     type="button"
                     variant="ghost"
                     onClick={goBack}
-                    className="text-sky-600 hover:text-sky-700 hover:bg-sky-50 rounded-xl"
+                    className="text-sky-600 hover:text-sky-700 hover:bg-sky-50 rounded-xl cursor-pointer"
                   >
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Back
@@ -1386,7 +1385,7 @@ export default function AnimatedAuthPage(): ReactElement {
               {/* Footer - Only show on initial step */}
               {authStep === "initial" && (
                 <motion.div
-                  className="text-center mt-8"
+                  className="text-center"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.6 }}
@@ -1397,7 +1396,7 @@ export default function AnimatedAuthPage(): ReactElement {
                       : "Already have an account? "}
                     <button
                       type="button"
-                      className="text-sky-600 hover:text-sky-700 font-medium"
+                      className="text-sky-600 hover:text-sky-700 font-medium cursor-pointer"
                       onClick={() =>
                         setActiveTab(activeTab === "login" ? "signup" : "login")
                       }

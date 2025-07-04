@@ -69,6 +69,14 @@ export interface User {
   TFA_enabled: boolean;
   activity_logs: ActivityLog[];
 }
+export interface AttachmentFile {
+  id: string;
+  name: string;
+  mime: string;
+  url: string;
+  size: number;
+  created_at: Date;
+}
 export interface CorpusFile {
   id: string;
   name: string;

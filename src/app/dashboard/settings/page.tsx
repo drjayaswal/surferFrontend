@@ -51,13 +51,11 @@ export default function SettingsPage() {
   useHydration();
 
   const user = userStore((s) => s.user);
-  const loading = userStore((s) => s.loading);
   const setUser = userStore((s) => s.setUser);
   const authChecked = userStore((s) => s.authChecked);
   const [showPassword, setShowPassword] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
   const [activeTab, setActiveTab] = useState("");
-  const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -66,7 +64,6 @@ export default function SettingsPage() {
   const lastGeneratedTimeRef = useRef<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [activityLogs, setActivityLogs] = useState<ActivityLog[]>([]);
   const [confirmName, setConfirmName] = useState("");
   const [tfaEnabled, setTfaEnabled] = useState(false);
   const [tfaChanged, setTfaChanged] = useState(false);

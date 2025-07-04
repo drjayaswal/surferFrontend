@@ -11,19 +11,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  File,
-  FileText,
-  FileSpreadsheet,
-  FileImage,
   MoreHorizontal,
   Search,
   Download,
   Trash2,
   Paperclip,
   Eye,
-  Tally1,
-  EyeOff,
-  Plus,
   Loader2,
 } from "lucide-react";
 import Folders from "@/components/ui/folder";
@@ -31,7 +24,6 @@ import { CorpusFile, User } from "@/types/app.types";
 import Toolbar from "@/components/ui/toolbar";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/api";
-import { DocumentPreviewModal } from "./components/documentViewer";
 import { openFileInNewTab, toBase64 } from "@/lib/utils";
 import { useHydration } from "@/hooks/useHydration";
 import { userStore } from "@/stores/userStore";
@@ -40,11 +32,9 @@ export default function CorpusPage() {
   useHydration();
 
   const user = userStore((s) => s.user);
-  const loading = userStore((s) => s.loading);
   const setUser = userStore((s) => s.setUser);
   const authChecked = userStore((s) => s.authChecked);
 
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [files, setFiles] = useState<CorpusFile[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);

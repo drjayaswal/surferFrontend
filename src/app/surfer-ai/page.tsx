@@ -19,8 +19,14 @@ import {
   Waves,
   Search,
   Loader2,
+  Upload,
+  FileLock,
+  FileCheck2,
+  Eye,
+  File,
+  CircleX,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, openFileInNewTab, toBase64 } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
@@ -28,6 +34,10 @@ import LoginNavigation from "@/components/loginNavigation";
 import { apiClient } from "@/lib/api";
 import { useHydration } from "@/hooks/useHydration";
 import { userStore } from "@/stores/userStore";
+import { toast } from "sonner";
+import { AttachmentFile } from "@/types/app.types";
+import Toolbar from "@/components/ui/toolbar";
+import Folders from "@/components/ui/folder";
 
 declare global {
   interface Window {
@@ -54,6 +64,11 @@ export default function DashboardHome() {
   const inputRef = useRef<HTMLInputElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
+  const [attachments, setAttachments] = useState<
+    { file: File; display: AttachmentFile }[]
+  >([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -118,18 +133,25 @@ export default function DashboardHome() {
       setTimeout(() => inputRef.current?.focus(), 0);
 
       try {
+        const rawFiles = attachments.map((a) => a.file); // ✅ Send only File[] to backend
+
         const response = await apiClient.sendConnection({
           prompt: messageText,
+          attachments: rawFiles,
         });
 
         if (response.success && response.data) {
-          connectionStore
-            .getState()
-            .setConnections([
-              ...connectionStore.getState().connections,
-              response.data,
-            ]);
-          console.log("Connection saved and added to store");
+          connectionStore.getState().setConnections([
+            ...connectionStore.getState().connections,
+            {
+              ...response.data,
+              prompt: {
+                ...response.data.prompt,
+                attachments: attachments.map((a) => a.display),
+              },
+            },
+          ]);
+          setAttachments([]); // Clear after sending
         } else {
           console.warn("Message not sent successfully");
         }
@@ -139,8 +161,58 @@ export default function DashboardHome() {
         setIsLoading(false);
       }
     },
-    [prompt, isListening]
+    [prompt, isListening, attachments]
   );
+  const handleUploadAttachments = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const inputFiles = e.target.files;
+    if (!inputFiles || inputFiles.length === 0) return;
+
+    const files = Array.from(inputFiles);
+    if (files.length > 2) {
+      toast.error("Maximum 2 attachments allowed!");
+      return;
+    }
+
+    const maxSize = 2 * 1024 * 1024;
+    for (const file of files) {
+      if (file.size > maxSize) {
+        toast.error(`"${file.name}" exceeds 2MB size limit`);
+        return;
+      }
+    }
+
+    const toastId = toast.loading("Uploading attachments...");
+
+    try {
+      const mapped = await Promise.all(
+        files.map(async (file) => {
+          const fakeId = `ATTACH-${Date.now()}-${file.name}`;
+          const localUrl = URL.createObjectURL(file);
+
+          const display: AttachmentFile = {
+            id: fakeId,
+            name: file.name,
+            mime: file.type,
+            url: localUrl,
+            size: file.size,
+            created_at: new Date(),
+          };
+
+          return { file, display };
+        })
+      );
+
+      setAttachments((prev) => [...prev, ...mapped]);
+      toast.success("Attachments uploaded successfully");
+      toast.dismiss(toastId);
+    } catch (error) {
+      toast.dismiss(toastId);
+      toast.error("Upload failed. Please try again.");
+      console.error(error);
+    }
+  };
 
   if (!authChecked) {
     return (
@@ -162,7 +234,9 @@ export default function DashboardHome() {
     if (!isListening) startVoiceRecognition();
     else stopVoiceRecognition();
   };
-
+  const clearAttachments = () => {
+    setAttachments([]);
+  };
   const startVoiceRecognition = () => {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -211,7 +285,6 @@ export default function DashboardHome() {
         <div className="mt-10">
           <LoginNavigation />
         </div>
-
         <div className="flex-1 flex flex-col overflow-hidden">
           <div
             ref={chatContainerRef}
@@ -264,81 +337,88 @@ export default function DashboardHome() {
                     const time = new Date(conn.created_at);
 
                     return (
-                      <div key={conn.id}>
-                        {/* User Prompt */}
-                        <div
-                          className={cn(
-                            "flex gap-3 group animate-in fade-in-0 slide-in-from-bottom-3 duration-300",
-                            "flex-row-reverse"
-                          )}
-                        >
-                          <Avatar className="h-8 w-8 flex-shrink-0 mt-1">
-                            <AvatarFallback className="text-lg font-medium p-[6px] bg-black text-white">
-                              <User />
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0 max-w-[80%] sm:max-w-[75%] md:max-w-[65%] items-end flex flex-col">
-                            <Card className="p-3 gap-4 transition-all shadow-none border-0 break-words whitespace-pre-wrap bg-black/5 text-gray-800">
-                              <p className="text-md leading-relaxed m-0">
-                                {userContent}
-                              </p>
-
-                              {/* 🖼️ Attachments */}
-                              {/* {conn.prompt.attachments?.length! > 0 && (
-                              <div className="mt-2 flex flex-wrap gap-2">
-                                {conn.prompt.attachments!.map((att, index) => (
-                                  <Image
-                                    key={index}
-                                    src={att.url}
-                                    alt={`attachment-${index}`}
-                                    width={200}
-                                    height={200}
-                                    className="rounded-lg border shadow"
-                                  />
-                                ))}
-                              </div>
-                            )} */}
-
-                              <span className="text-md text-black">
-                                {formatTime(time)}
-                              </span>
-                            </Card>
+                      <div key={conn.id} className="space-y-4 px-5">
+                        <div className="flex justify-end">
+                          <div className="flex gap-3 flex-row-reverse max-w-[85%]">
+                            <Avatar className="h-8 w-8 mt-1 flex-shrink-0">
+                              <AvatarFallback className="text-lg font-medium p-[6px] bg-black/10 text-black/60">
+                                <User />
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 flex flex-col items-end">
+                              <Card className="p-3 bg-black/1 text-gray-900 border-0 shadow-none rounded-xl whitespace-pre-wrap">
+                                <p className="text-md leading-relaxed">
+                                  {userContent}
+                                </p>
+                                {Array.isArray(conn.prompt.attachments) &&
+                                  conn.prompt.attachments.length > 0 && (
+                                    <div className="flex -m-5 flex-wrap">
+                                      <Folders
+                                        size={0.5}
+                                        items={conn.prompt.attachments as any}
+                                        onItemClick={(index) =>
+                                          window.open(
+                                            (
+                                              conn.prompt.attachments?.[
+                                                index
+                                              ] as any
+                                            )?.url,
+                                            "_blank"
+                                          )
+                                        }
+                                      />
+                                    </div>
+                                  )}{" "}
+                                <span className="text-xs text-gray-500 block">
+                                  {formatTime(time)}
+                                </span>
+                              </Card>
+                            </div>
                           </div>
                         </div>
 
-                        {/* AI Answer */}
-                        <div className="flex gap-3 group animate-in fade-in-0 slide-in-from-bottom-3 duration-300">
-                          <Avatar className="h-8 w-8 flex-shrink-0 mt-1">
-                            <AvatarFallback className="text-lg font-medium p-[6px] bg-sky-500 text-white">
-                              <Waves />
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 max-w-fit">
-                            <Card className="p-3 gap-4 transition-all shadow-none border-0 break-words whitespace-pre-wrap bg-sky-600/10 text-sky-600">
-                              <p className="text-md leading-relaxed m-0">
-                                {aiContent}
-                              </p>
-                              <span className="text-md text-sky-600">
-                                {formatTime(time)}
-                              </span>
-                            </Card>
+                        <div className="flex justify-start">
+                          <div className="flex gap-3 flex-row max-w-[85%]">
+                            <Avatar className="h-10 w-10 mt-1 flex-shrink-0">
+                              <Image
+                                src="/Surf.png"
+                                width={40}
+                                height={40}
+                                alt="surf-logo"
+                              />{" "}
+                            </Avatar>
+                            <div className="flex-1 flex flex-col items-start">
+                              <Card className="p-3 bg-sky-900/1 text-sky-700 border-0 shadow-none rounded-xl whitespace-pre-wrap">
+                                <p className="text-md leading-relaxed">
+                                  {aiContent}
+                                </p>
+                                <span className="text-xs text-sky-700 block">
+                                  {formatTime(time)}
+                                </span>
+                              </Card>
+                            </div>
                           </div>
                         </div>
                       </div>
                     );
                   })}
                   {isLoading && (
-                    <div className="flex gap-3 items-center">
-                      <Avatar className="h-8 w-8 flex-shrink-0 mt-1">
-                        <AvatarFallback className="text-md font-medium p-[6px] bg-sky-500/10 text-sky-500">
-                          <Waves />
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="text-md text-sky-600 animate-pulse">
-                        typing...
+                    <div className="flex items-center gap-3 px-5 py-5 animate-fade-in">
+                      <Image
+                        src="/Surf.png"
+                        width={40}
+                        height={40}
+                        alt="surf-logo"
+                      />
+                      <div className="relative px-4 pl-2 -mr-4 bg-transparent text-sky-600 rounded-xl shadow-none max-w-[200px]">
+                        <div className="flex items-center gap-1 justify-center h-5">
+                          <span className="h-2 w-2 bg-sky-600 rounded-full animate-bounce delay-600" />
+                          <span className="h-2 w-2 bg-sky-600 rounded-full animate-bounce delay-400" />
+                          <span className="h-2 w-2 bg-sky-600 rounded-full animate-bounce delay-200" />
+                        </div>
                       </div>
                     </div>
-                  )}
+                  )}{" "}
                   <div ref={connectionsEndRef} />
                 </div>
               )}
@@ -346,12 +426,12 @@ export default function DashboardHome() {
           </div>
 
           {/* Sticky Input Area */}
-          <div className="fixed min-w-400 rounded-4xl bottom-5 mx-5 z-10 shadow-none">
-            <Card className="rounded-4xl pt-4 pb-2 pr-2 pl-1 gap-1 bg-sky-50/70 backdrop-blur-sm border-0 shadow-none">
+          <div className="fixed min-w-400 rounded-4xl bottom-5 mx-5 z-10 shadow-lg">
+            <Card className="rounded-4xl pt-4 pb-2 pr-2 pl-1 gap-1 bg-white/50 backdrop-blur-sm border-0 shadow-none">
               <div className="relative">
                 <Input
                   ref={inputRef}
-                  placeholder="Write a query or click the mic..."
+                  placeholder="Got Ideas? Questions? Let’s explore...."
                   autoFocus
                   className="min-h-[50px] pr-24 pl-15 pb-[9px] border-none shadow-none focus-visible:ring-0 text-gray-800 text-xl placeholder:text-sky-700 placeholder:text-xl file:text-xl md:text-xl"
                   value={prompt}
@@ -372,9 +452,24 @@ export default function DashboardHome() {
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 pb-1 text-sky-700">
                   <Search className="h-7 w-7" />
                 </div>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-2 bg-sky-500/20 p-1 rounded-2xl shadow-inner backdrop-blur-md">
+                <div className="absolute right-28 top-1/2 -translate-y-1/2 flex gap-2 bg-sky-500/20 p-1 rounded-2xl shadow-inner backdrop-blur-md">
                   <Button
-                    className="h-10 w-10 rounded-xl bg-sky-500 hover:bg-sky-700 text-white hover:scale-110 transition-all"
+                    className="h-10 w-10 rounded-xl bg-sky-400 hover:bg-sky-500 text-white hover:scale-110 transition-all cursor-pointer"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Upload className="h-6 w-6" />
+                  </Button>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    multiple
+                    onChange={handleUploadAttachments}
+                  />
+                </div>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-2 bg-sky-100 p-1 rounded-2xl shadow-inner backdrop-blur-md">
+                  <Button
+                    className="h-10 w-10 rounded-xl bg-sky-400 hover:bg-sky-500 text-white hover:scale-110 transition-all cursor-pointer"
                     onClick={toggleVoiceRecognition}
                   >
                     {isListening ? (
@@ -387,7 +482,7 @@ export default function DashboardHome() {
                     onClick={() => handleSendMessage()}
                     disabled={!prompt.trim() || isLoading}
                     className={cn(
-                      "h-10 w-10 rounded-xl text-white bg-sky-500 hover:scale-110 active:scale-105 transition-all",
+                      "h-10 w-10 rounded-xl text-white bg-sky-500 hover:bg-sky-600 hover:scale-110 active:scale-105 transition-all cursor-pointer",
                       (!prompt.trim() || isLoading) &&
                         "opacity-50 cursor-not-allowed"
                     )}
@@ -417,8 +512,56 @@ export default function DashboardHome() {
                 </div>
               </div>
             </Card>
+            {attachments.length > 0 && (
+              <div className="fixed bottom-29 right-6 z-20 max-w-sm w-full p-4 rounded-xl bg-white/50 backdrop-blur-lg  transition-all animate-fade-in">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="text-sm font-semibold text-gray-700 tracking-wide">
+                    Attached Files
+                  </h4>
+                  <span className="text-sm text-gray-500 flex gap-5 items-center">
+                    {attachments.length} file{attachments.length > 1 ? "s" : ""}
+                    <Button
+                      onClick={clearAttachments}
+                      className="bg-transparent text-red-500 shadow-none hover:bg-red-600/10 rounded-full cursor-pointer"
+                    >
+                      <CircleX />
+                    </Button>
+                  </span>
+                </div>
+
+                <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                  {attachments.map((file, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between p-2 rounded-md bg-transparent transition-colors group"
+                    >
+                      <div className="flex items-center gap-2 w-3/4 truncate">
+                        <div className="h-6 w-6 rounded-md bg-transparent text-sky-400 text-xs flex items-center justify-center font-semibold">
+                          <File />
+                        </div>
+                        <p className="text-sm text-gray-800 truncate">
+                          {file.display.name}
+                        </p>
+                      </div>
+                      <a
+                        href={file.display.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-sky-400 underline hover:text-sky-500 transition-colors cursor-pointer"
+                      >
+                        <Eye />
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}{" "}
           </div>
         </div>
+        <span className="block text-[10px] text-sky-700 px-3 rounded-md text-center">
+          This AI is not a substitute for professional advice. Use discretion
+          and verify all outputs
+        </span>{" "}
       </div>
     </motion.div>
   );
