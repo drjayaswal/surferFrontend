@@ -34,13 +34,11 @@ export default function Home() {
     }
   }, [urlQuery]);
 
-  // Update time every second
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // Activate wave animation periodically
   useEffect(() => {
     const interval = setInterval(() => {
       setIsWaveActive(true);
@@ -101,10 +99,9 @@ export default function Home() {
               <Link href="/surfer-playground">
                 <Button
                   size="lg"
-                  className="hover:bg-gradient-to-r hover:from-sky-200 hover:via-sky-400 hover:to-sky-500 px-4 rounded-4xl bg-transparent hover:text-white text-sky-400 py-5 text-xl shadow-none"
+                  className="hover:bg-gradient-to-r hover:from-sky-200 hover:via-sky-400 hover:to-sky-500 px-4 rounded-4xl bg-transparent hover:text-white text-sky-400 py-5 text-xl shadow-none cursor-pointer"
                 >
                   <Shapes className="animate-spin" />
-                  Try Surfer Playground
                 </Button>
               </Link>
             </div>

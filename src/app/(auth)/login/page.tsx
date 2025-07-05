@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Eye,
   EyeOff,
@@ -29,7 +28,8 @@ import { apiClient } from "@/lib/api";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { AuthStep, FormData, FormErrors } from "@/types/app.types";
-import Footer from "@/components/footer";
+import SmallFooter from "@/components/smallFooter";
+import LoginNavigation from "@/components/loginNavigation";
 
 const stepVariants: Variants = {
   enter: (direction: number) => ({
@@ -300,7 +300,6 @@ export default function AnimatedAuthPage(): ReactElement {
     confirmPassword: "",
     firstName: "",
     lastName: "",
-    rememberMe: false,
     otp: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
@@ -336,7 +335,6 @@ export default function AnimatedAuthPage(): ReactElement {
       confirmPassword: "",
       firstName: "",
       lastName: "",
-      rememberMe: false,
       otp: "",
     });
     setErrors({});
@@ -754,26 +752,16 @@ export default function AnimatedAuthPage(): ReactElement {
                   </motion.div>
                 )}
 
-                {/* Remember Me & Forgot Password */}
+                {/* Forgot Password */}
                 <motion.div
-                  className="flex items-center justify-between"
+                  className="flex justify-between items-center"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 }}
                 >
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="remember"
-                      checked={formData.rememberMe}
-                      className="data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600 cursor-pointer"
-                      onCheckedChange={(checked) =>
-                        handleInputChange("rememberMe", checked as boolean)
-                      }
-                    />
-                    <Label htmlFor="remember" className="text-sm text-gray-600">
-                      Remember me
-                    </Label>
-                  </div>
+                  <span className="text-[12px] text-gray-800/70">
+                    credentials will be saved
+                  </span>
                   <button
                     type="button"
                     onClick={() => goToStep("forgot-password", 1)}
@@ -792,7 +780,7 @@ export default function AnimatedAuthPage(): ReactElement {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full h-12 bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                    className="w-full h-12 bg-gradient-to-r from-sky-400 to-sky-500 hover:from-sky-500 hover:to-sky-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 cursor-pointer"
                   >
                     {isLoading ? (
                       <>
@@ -953,7 +941,7 @@ export default function AnimatedAuthPage(): ReactElement {
                       </button>
                     </div>
                     {errors.confirmPassword && (
-                      <p className="text-sm text-red-600 flex items-center gap-1">
+                      <p className="text-sm text-red-600 flex items-center gap-2">
                         <AlertCircle className="h-4 w-4" />
                         {errors.confirmPassword}
                       </p>
@@ -961,12 +949,11 @@ export default function AnimatedAuthPage(): ReactElement {
                   </div>
                 </motion.div>
 
-                {/* General Error */}
                 {errors.general && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-3 bg-red-50 border border-red-200 rounded-xl"
+                    className="bg-transparent rounded-xl"
                   >
                     <p className="text-sm text-red-600 flex items-center gap-2">
                       <AlertCircle className="h-4 w-4" />
@@ -975,35 +962,29 @@ export default function AnimatedAuthPage(): ReactElement {
                   </motion.div>
                 )}
 
-                {/* Terms Agreement */}
                 <motion.div
                   className="flex items-start space-x-2"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 }}
                 >
-                  <Checkbox
-                    id="terms"
-                    className="mt-1 data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600 cursor-pointer"
-                    required
-                  />
                   <Label
                     htmlFor="terms"
-                    className="text-sm text-gray-600 leading-relaxed"
+                    className="text-center text-[12px] text-gray-800/70"
                   >
-                    I agree to the{" "}
+                    creating your account makes you agree
                     <Link
                       href="/terms"
-                      className="text-sky-600 hover:text-sky-700"
+                      className="text-sky-600 hover:text-sky-700 p-0 m-0"
                     >
-                      Terms of Service
-                    </Link>{" "}
-                    and{" "}
+                      Terms
+                    </Link>
+                    and
                     <Link
                       href="/privacy"
-                      className="text-sky-600 hover:text-sky-700"
+                      className="text-sky-600 hover:text-sky-700 p-0 m-0"
                     >
-                      Privacy Policy
+                      Privacy
                     </Link>
                   </Label>
                 </motion.div>
@@ -1277,6 +1258,8 @@ export default function AnimatedAuthPage(): ReactElement {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
+      <LoginNavigation />
+
       {/* Main Content */}
       <div className="relative z-20 min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-md">
@@ -1426,7 +1409,7 @@ export default function AnimatedAuthPage(): ReactElement {
           </motion.div>
         </div>
       </div>
-      <Footer />
+      <SmallFooter />
     </div>
   );
 }

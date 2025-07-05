@@ -25,6 +25,8 @@ import {
   Eye,
   File,
   CircleX,
+  ArrowUp,
+  Files,
 } from "lucide-react";
 import { cn, openFileInNewTab, toBase64 } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -302,15 +304,12 @@ export default function DashboardHome() {
                     />
                   </div>
                   <h1 className="text-4xl md:text-5xl font-medium text-gray-800 mb-4 text-center">
-                    {getGreeting()},{" "}
-                    <span className="bg-gradient-to-tr from-sky-400 via-sky-500 to-sky-800 bg-clip-text text-transparent font-bold animate-gradient-x text-shadow-lg">
-                      Surfer
+                    {getGreeting()}{" "}
+                    <span className="bg-gradient-to-tr from-sky-200 via-sky-500 to-sky-800 bg-clip-text text-transparent font-bold animate-gradient-x">
+                      {user?.name}
                     </span>
                   </h1>
-                  <h2 className="text-2xl md:text-3xl font-medium text-gray-600 text-center mb-12">
-                    What's on your mind?
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl mt-10">
                     {examples.map((example, index) => (
                       <Card
                         key={index}
@@ -424,144 +423,167 @@ export default function DashboardHome() {
               )}
             </div>
           </div>
-
           {/* Sticky Input Area */}
-          <div className="fixed min-w-400 rounded-4xl bottom-5 mx-5 z-10 shadow-lg">
-            <Card className="rounded-4xl pt-4 pb-2 pr-2 pl-1 gap-1 bg-white/50 backdrop-blur-sm border-0 shadow-none">
-              <div className="relative">
-                <Input
-                  ref={inputRef}
-                  placeholder="Got Ideas? Questions? Let’s explore...."
-                  autoFocus
-                  className="min-h-[50px] pr-24 pl-15 pb-[9px] border-none shadow-none focus-visible:ring-0 text-gray-800 text-xl placeholder:text-sky-700 placeholder:text-xl file:text-xl md:text-xl"
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      handleSendMessage();
-                    } else if (e.key === "Escape") {
-                      e.preventDefault();
-                      setPrompt("");
-                    } else if (e.key.toLowerCase() === "v" && e.shiftKey) {
-                      e.preventDefault();
-                      toggleVoiceRecognition();
-                    }
-                  }}
-                />
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 pb-1 text-sky-700">
-                  <Search className="h-7 w-7" />
-                </div>
-                <div className="absolute right-28 top-1/2 -translate-y-1/2 flex gap-2 bg-sky-500/20 p-1 rounded-2xl shadow-inner backdrop-blur-md">
-                  <Button
-                    className="h-10 w-10 rounded-xl bg-sky-400 hover:bg-sky-500 text-white hover:scale-110 transition-all cursor-pointer"
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <Upload className="h-6 w-6" />
-                  </Button>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    className="hidden"
-                    multiple
-                    onChange={handleUploadAttachments}
+          <div className="fixed bottom-5 z-10 w-full px-4">
+            <div className="max-w-5xl mx-auto rounded-4xl shadow-lg bg-white/50 backdrop-blur-sm">
+              <Card className="rounded-4xl pt-4 pb-2 px-3 gap-1 bg-transparent border-0 shadow-none">
+                <div className="relative w-full">
+                  <Input
+                    ref={inputRef}
+                    placeholder="Ask Anything...."
+                    autoFocus
+                    className="min-h-[50px] pr-24 pl-15 pb-[9px] border-none shadow-none focus-visible:ring-0 text-gray-800 text-xl placeholder:text-sky-700 placeholder:text-xl file:text-xl md:text-xl"
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        handleSendMessage();
+                      } else if (e.key === "Escape") {
+                        e.preventDefault();
+                        setPrompt("");
+                      } else if (e.key.toLowerCase() === "v" && e.shiftKey) {
+                        e.preventDefault();
+                        toggleVoiceRecognition();
+                      }
+                    }}
                   />
-                </div>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-2 bg-sky-100 p-1 rounded-2xl shadow-inner backdrop-blur-md">
-                  <Button
-                    className="h-10 w-10 rounded-xl bg-sky-400 hover:bg-sky-500 text-white hover:scale-110 transition-all cursor-pointer"
-                    onClick={toggleVoiceRecognition}
-                  >
-                    {isListening ? (
-                      <EarIcon className="h-6 w-6 animate-pulse" />
-                    ) : (
-                      <Mic className="h-6 w-6" />
-                    )}
-                  </Button>
-                  <Button
-                    onClick={() => handleSendMessage()}
-                    disabled={!prompt.trim() || isLoading}
-                    className={cn(
-                      "h-10 w-10 rounded-xl text-white bg-sky-500 hover:bg-sky-600 hover:scale-110 active:scale-105 transition-all cursor-pointer",
-                      (!prompt.trim() || isLoading) &&
-                        "opacity-50 cursor-not-allowed"
-                    )}
-                  >
-                    <AnimatePresence mode="wait">
-                      {prompt === "" ? (
-                        <motion.div
-                          key="idle"
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0 }}
-                        >
-                          <SendHorizonal className="h-5 w-5" />
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          key="ready"
-                          initial={{ y: 20, opacity: 0 }}
-                          animate={{ y: 0, opacity: 1 }}
-                          exit={{ y: -20, opacity: 0 }}
-                        >
-                          <Send className="h-5 w-5 -rotate-45" />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </Button>
-                </div>
-              </div>
-            </Card>
-            {attachments.length > 0 && (
-              <div className="fixed bottom-29 right-6 z-20 max-w-sm w-full p-4 rounded-xl bg-white/50 backdrop-blur-lg  transition-all animate-fade-in">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-sm font-semibold text-gray-700 tracking-wide">
-                    Attached Files
-                  </h4>
-                  <span className="text-sm text-gray-500 flex gap-5 items-center">
-                    {attachments.length} file{attachments.length > 1 ? "s" : ""}
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 pb-1 text-sky-700">
+                    <Search className="h-7 w-7" />
+                  </div>
+                  <div className="absolute right-28 top-1/2 -translate-y-1/2 flex gap-2 bg-sky-500/20 p-1 rounded-2xl shadow-inner backdrop-blur-md">
                     <Button
-                      onClick={clearAttachments}
-                      className="bg-transparent text-red-500 shadow-none hover:bg-red-600/10 rounded-full cursor-pointer"
+                      className="h-10 w-10 rounded-xl bg-sky-300 hover:bg-sky-400 text-white hover:scale-110 transition-all cursor-pointer"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={!prompt.trim() || isLoading}
                     >
-                      <CircleX />
+                      <AnimatePresence mode="wait">
+                        {attachments.length > 0 ? (
+                          <motion.div
+                            key="idle"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                          >
+                            <Files className="h-6 w-6" />
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="ready"
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: -20, opacity: 0 }}
+                          >
+                            <Upload className="h-6 w-6" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </Button>
-                  </span>
-                </div>
-
-                <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
-                  {attachments.map((file, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-center justify-between p-2 rounded-md bg-transparent transition-colors group"
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      multiple
+                      onChange={handleUploadAttachments}
+                    />
+                  </div>
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-2 bg-sky-100 p-1 rounded-2xl shadow-inner backdrop-blur-md">
+                    <Button
+                      className="h-10 w-10 rounded-xl bg-sky-400 hover:bg-sky-500 text-white hover:scale-110 transition-all cursor-pointer"
+                      onClick={toggleVoiceRecognition}
                     >
-                      <div className="flex items-center gap-2 w-3/4 truncate">
-                        <div className="h-6 w-6 rounded-md bg-transparent text-sky-400 text-xs flex items-center justify-center font-semibold">
-                          <File />
-                        </div>
-                        <p className="text-sm text-gray-800 truncate">
-                          {file.display.name}
-                        </p>
-                      </div>
-                      <a
-                        href={file.display.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-sky-400 underline hover:text-sky-500 transition-colors cursor-pointer"
-                      >
-                        <Eye />
-                      </a>
-                    </div>
-                  ))}
+                      {isListening ? (
+                        <EarIcon className="h-6 w-6 animate-pulse" />
+                      ) : (
+                        <Mic className="h-6 w-6" />
+                      )}
+                    </Button>
+                    <Button
+                      onClick={() => handleSendMessage()}
+                      disabled={!prompt.trim() || isLoading}
+                      className={cn(
+                        "h-10 w-10 rounded-xl text-white bg-sky-500 hover:bg-sky-600 hover:scale-110 active:scale-105 transition-all cursor-pointer",
+                        (!prompt.trim() || isLoading) &&
+                          "opacity-50 cursor-not-allowed"
+                      )}
+                    >
+                      <AnimatePresence mode="wait">
+                        {prompt === "" ? (
+                          <motion.div
+                            key="idle"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                          >
+                            <SendHorizonal className="h-5 w-5" />
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="ready"
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: -20, opacity: 0 }}
+                          >
+                            <Send className="h-5 w-5 -rotate-45" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            )}{" "}
+              </Card>
+              {attachments.length > 0 && !isLoading && (
+                <div className="fixed bottom-29 right-6 z-20 max-w-sm w-full p-4 rounded-xl bg-white/50 backdrop-blur-lg  transition-all animate-fade-in">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-sm font-semibold text-gray-700 tracking-wide">
+                      Attached Files
+                    </h4>
+                    <span className="text-sm text-gray-500 flex gap-5 items-center">
+                      {attachments.length} file
+                      {attachments.length > 1 ? "s" : ""}
+                      <Button
+                        onClick={clearAttachments}
+                        className="bg-transparent text-red-500 shadow-none hover:bg-red-600/10 rounded-full cursor-pointer"
+                      >
+                        <CircleX />
+                      </Button>
+                    </span>
+                  </div>
+
+                  <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    {attachments.map((file, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between p-2 rounded-md bg-transparent transition-colors group"
+                      >
+                        <div className="flex items-center gap-2 w-3/4 truncate">
+                          <div className="h-6 w-6 rounded-md bg-transparent text-sky-400 text-xs flex items-center justify-center font-semibold">
+                            <File />
+                          </div>
+                          <p className="text-sm text-gray-800 truncate">
+                            {file.display.name}
+                          </p>
+                        </div>
+                        <a
+                          href={file.display.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-sky-400 underline hover:text-sky-500 transition-colors cursor-pointer"
+                        >
+                          <Eye />
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}{" "}
+            </div>
           </div>
+          <span className="block text-[10px] text-sky-700 px-3 rounded-md text-center">
+            This AI is not a substitute for professional advice. Use discretion
+            and verify all outputs
+          </span>{" "}
         </div>
-        <span className="block text-[10px] text-sky-700 px-3 rounded-md text-center">
-          This AI is not a substitute for professional advice. Use discretion
-          and verify all outputs
-        </span>{" "}
       </div>
     </motion.div>
   );

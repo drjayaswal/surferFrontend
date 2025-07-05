@@ -43,6 +43,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UsageData, TopicData, ModelUsageData } from "@/types/app.types";
+import ComingSoonPage from "@/components/comingSoon";
 
 export default function AnalyticsPage() {
   const [timeRange, setTimeRange] = useState<
@@ -113,8 +114,11 @@ export default function AnalyticsPage() {
 
   return (
     <div className="flex flex-col h-full bg-white">
+      <div>
+        <ComingSoonPage />
+      </div>
       {/* Header */}
-      <div className="border-b border-sky-600 p-6">
+      <div className="fixed border-b border-sky-600 p-6 blur-lg">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-semibold text-sky-700 mb-1">
@@ -185,7 +189,7 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-auto p-6">
+      <div className="fixed flex-1 overflow-auto p-6 blur-lg">
         <div className="max-w-7xl mx-auto">
           {/* Key Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

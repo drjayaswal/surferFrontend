@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import ComingSoonPage from "@/components/comingSoon";
 
 interface ChatMessage {
   id: string;
@@ -104,161 +105,7 @@ export default function ChatHistoryPage() {
   );
 
   // Sample chat history data
-  const [chatSessions] = useState<ChatSession[]>([
-    {
-      id: "1",
-      title: "React Hooks Implementation",
-      startTime: new Date(2025, 5, 11, 9, 30),
-      lastActivity: new Date(2025, 5, 11, 10, 15),
-      category: "Development",
-      isFavorite: true,
-      messageCount: 12,
-      messages: [
-        {
-          id: "1-1",
-          role: "user",
-          content: "How do I implement useState in React?",
-          timestamp: new Date(2025, 5, 11, 9, 30),
-        },
-        {
-          id: "1-2",
-          role: "assistant",
-          content:
-            "useState is a React Hook that lets you add state to functional components. Here's how to use it:\n\n```jsx\nimport React, { useState } from 'react';\n\nfunction Counter() {\n  const [count, setCount] = useState(0);\n\n  return (\n    <div>\n      <p>You clicked {count} times</p>\n      <button onClick={() => setCount(count + 1)}>\n        Click me\n      </button>\n    </div>\n  );\n}\n```",
-          timestamp: new Date(2025, 5, 11, 9, 31),
-        },
-        {
-          id: "1-3",
-          role: "user",
-          content: "What about useEffect?",
-          timestamp: new Date(2025, 5, 11, 9, 35),
-        },
-        {
-          id: "1-4",
-          role: "assistant",
-          content:
-            "useEffect is used for side effects in functional components. It's similar to componentDidMount, componentDidUpdate, and componentWillUnmount combined.",
-          timestamp: new Date(2025, 5, 11, 9, 36),
-        },
-      ],
-    },
-    {
-      id: "2",
-      title: "API Design Best Practices",
-      startTime: new Date(2025, 5, 10, 14, 15),
-      lastActivity: new Date(2025, 5, 10, 15, 30),
-      category: "Backend",
-      messageCount: 8,
-      messages: [
-        {
-          id: "2-1",
-          role: "user",
-          content: "What are the best practices for REST API design?",
-          timestamp: new Date(2025, 5, 10, 14, 15),
-        },
-        {
-          id: "2-2",
-          role: "assistant",
-          content:
-            "Here are key REST API design best practices:\n\n1. Use proper HTTP methods (GET, POST, PUT, DELETE)\n2. Use meaningful resource names\n3. Implement proper status codes\n4. Version your APIs\n5. Use consistent naming conventions",
-          timestamp: new Date(2025, 5, 10, 14, 16),
-        },
-      ],
-    },
-    {
-      id: "3",
-      title: "Machine Learning Basics",
-      startTime: new Date(2025, 5, 9, 11, 45),
-      lastActivity: new Date(2025, 5, 9, 12, 30),
-      category: "AI/ML",
-      isFavorite: true,
-      messageCount: 15,
-      messages: [
-        {
-          id: "3-1",
-          role: "user",
-          content: "Can you explain supervised vs unsupervised learning?",
-          timestamp: new Date(2025, 5, 9, 11, 45),
-        },
-        {
-          id: "3-2",
-          role: "assistant",
-          content:
-            "Supervised learning uses labeled data to train models, while unsupervised learning finds patterns in unlabeled data.",
-          timestamp: new Date(2025, 5, 9, 11, 46),
-        },
-      ],
-    },
-    {
-      id: "4",
-      title: "Database Optimization",
-      startTime: new Date(2025, 5, 8, 16, 20),
-      lastActivity: new Date(2025, 5, 8, 17, 10),
-      category: "Database",
-      messageCount: 6,
-      messages: [
-        {
-          id: "4-1",
-          role: "user",
-          content: "How can I optimize my database queries?",
-          timestamp: new Date(2025, 5, 8, 16, 20),
-        },
-        {
-          id: "4-2",
-          role: "assistant",
-          content:
-            "Database optimization techniques include proper indexing, query optimization, and database normalization.",
-          timestamp: new Date(2025, 5, 8, 16, 21),
-        },
-      ],
-    },
-    {
-      id: "5",
-      title: "UI/UX Design Principles",
-      startTime: new Date(2025, 5, 7, 10, 10),
-      lastActivity: new Date(2025, 5, 7, 11, 0),
-      category: "Design",
-      messageCount: 10,
-      messages: [
-        {
-          id: "5-1",
-          role: "user",
-          content: "What are the fundamental principles of good UI design?",
-          timestamp: new Date(2025, 5, 7, 10, 10),
-        },
-        {
-          id: "5-2",
-          role: "assistant",
-          content:
-            "Good UI design follows principles like consistency, clarity, feedback, and accessibility.",
-          timestamp: new Date(2025, 5, 7, 10, 11),
-        },
-      ],
-    },
-    {
-      id: "6",
-      title: "Cloud Computing Overview",
-      startTime: new Date(2025, 5, 6, 13, 30),
-      lastActivity: new Date(2025, 5, 6, 14, 15),
-      category: "Cloud",
-      messageCount: 7,
-      messages: [
-        {
-          id: "6-1",
-          role: "user",
-          content: "What are the benefits of cloud computing?",
-          timestamp: new Date(2025, 5, 6, 13, 30),
-        },
-        {
-          id: "6-2",
-          role: "assistant",
-          content:
-            "Cloud computing offers scalability, cost-effectiveness, and accessibility.",
-          timestamp: new Date(2025, 5, 6, 13, 31),
-        },
-      ],
-    },
-  ]);
+  const [chatSessions] = useState<ChatSession[]>([]);
 
   const getFilteredSessions = () => {
     const now = new Date();
@@ -377,8 +224,9 @@ export default function ChatHistoryPage() {
 
   return (
     <div className="flex flex-col h-full bg-white">
+      <ComingSoonPage />
       {/* Header */}
-      <div className="border-b border-sky-600 px-6 pt-4 pb-3">
+      <div className="border-b border-sky-600 px-6 pt-4 pb-3 blur-lg">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-sky-700 mb-1">
@@ -432,7 +280,7 @@ export default function ChatHistoryPage() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-scroll p-6">
+      <div className="flex-1 overflow-scroll p-6 blur-lg">
         {filteredSessions.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center">
             <div className="w-16 h-16 rounded-full bg-sky-100 flex items-center justify-center mb-4">
@@ -448,15 +296,6 @@ export default function ChatHistoryPage() {
                     timeFilter
                   ).toLowerCase()}.`}
             </p>
-            <Button
-              className="gap-2 bg-sky-600 rounded-3xl hover:bg-sky-700 text-white"
-              asChild
-            >
-              <Link href={"//surfer-ai"}>
-                <Waves className="h-4 w-4" />
-                Start SURFing
-              </Link>
-            </Button>
           </div>
         ) : (
           <div className="max-w-4xl mx-auto">

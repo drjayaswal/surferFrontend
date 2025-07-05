@@ -6,7 +6,18 @@ interface ApiResponse<T = any> {
   message: string;
   data?: T;
 }
+interface sendConnectPayload {
+  name: string;
+  email: string;
+  message: string;
+}
 
+interface sendHelpPayload {
+  firstName: string;
+  lastName: string;
+  email: string;
+  message: string;
+}
 interface GenerateOtpPayload {
   email: string;
 }
@@ -111,6 +122,17 @@ class ApiClient {
       body: formData,
     });
   }
+  async sendHelp(payload: sendHelpPayload): Promise<ApiResponse> {
+    return this.request("/user/help", {
+      method: "POST",
+    });
+  }
+  async sendConnect(payload: sendConnectPayload): Promise<ApiResponse> {
+    return this.request("/user/connect", {
+      method: "POST",
+    });
+  }
+
   async sendConnection(payload: sendConnectionPayload): Promise<ApiResponse> {
     const formData = new FormData();
 
@@ -143,7 +165,6 @@ class ApiClient {
       body: JSON.stringify(payload),
     });
   }
-
   async uploadCorpuses(payload: uploadCorpusPayload): Promise<ApiResponse> {
     const formData = new FormData();
     for (const file of payload.files) {
@@ -189,34 +210,29 @@ class ApiClient {
       body: JSON.stringify(payload),
     });
   }
-
   async login(payload: LoginPayload): Promise<ApiResponse> {
     return this.request("/auth/login", {
       method: "POST",
       body: JSON.stringify(payload),
     });
   }
-
   async verifySignupOtp(payload: VerifySignupOtpPayload): Promise<ApiResponse> {
     return this.request("/auth/verify-signup-otp", {
       method: "POST",
       body: JSON.stringify(payload),
     });
   }
-
   async verifyLoginOtp(payload: VerifyLoginOtpPayload): Promise<ApiResponse> {
     return this.request("/auth/verify-login-otp", {
       method: "POST",
       body: JSON.stringify(payload),
     });
   }
-
   async refreshTokens(): Promise<ApiResponse> {
     return this.request("/auth/refresh-tokens", {
       method: "POST",
     });
   }
-
   async logout(): Promise<ApiResponse> {
     return this.request("/auth/logout", {
       method: "GET",

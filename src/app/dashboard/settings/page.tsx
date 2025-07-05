@@ -44,7 +44,7 @@ import { toast } from "sonner";
 import { userStore } from "@/stores/userStore";
 import { Tooltip } from "@/components/ui/tooltip";
 import { TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip";
-import { COOLDOWN_MS } from "@/lib/const";
+import { cooldown_time } from "@/lib/const";
 import { useHydration } from "@/hooks/useHydration";
 
 export default function SettingsPage() {
@@ -209,7 +209,7 @@ export default function SettingsPage() {
 
     if (
       lastGeneratedTimeRef.current &&
-      now - lastGeneratedTimeRef.current < COOLDOWN_MS
+      now - lastGeneratedTimeRef.current < cooldown_time
     ) {
       toast.warning("Please wait before generating another key.");
       setIsGenerating(false);

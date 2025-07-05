@@ -4,13 +4,9 @@ import type React from "react";
 
 import {
   BarChart3,
-  Bell,
-  BellDot,
-  Brain,
   BrainCog,
   Calendar,
   ChevronRight,
-  CircleDashed,
   FileCog,
   Info,
   LogOut,

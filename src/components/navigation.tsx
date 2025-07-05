@@ -7,7 +7,7 @@ import Link from "next/link";
 
 const navLinks = [
   { href: "/surfer-ai", label: "SurferAI" },
-  { href: "/dashboard/plans", label: "Plans" },
+  { href: "/dashboard/corpuses", label: "Corpuses" },
   { href: "/connect", label: "Connect" },
   { href: "/help", label: "Help" },
   { href: "/login", label: "Login" },

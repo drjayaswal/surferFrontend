@@ -29,7 +29,6 @@ export default function Footer() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showBackToTop, setShowBackToTop] = useState(false);
 
-  // Generate AI particles for background effect
   const [particles, setParticles] = useState<AIParticle[]>([]);
   useEffect(() => {
     const generateParticles = () => {
@@ -130,17 +129,12 @@ export default function Footer() {
   const socialLinks = [
     {
       icon: <Github className="h-4 w-4 sm:h-5 sm:w-5 fill-white" />,
-      href: "#",
+      href: "https://github.com/drjayaswal",
       label: "GitHub",
     },
     {
-      icon: <Twitter className="h-4 w-4 sm:h-5 sm:w-5 fill-white" />,
-      href: "#",
-      label: "Twitter",
-    },
-    {
       icon: <Linkedin className="h-4 w-4 sm:h-5 sm:w-5 fill-white" />,
-      href: "#",
+      href: "https://linkedin.com/in/drjayaswal",
       label: "LinkedIn",
     },
   ];
@@ -206,7 +200,7 @@ export default function Footer() {
                         <span className="group-hover:translate-x-1 transition-transform duration-200 leading-relaxed">
                           {link.name}
                         </span>
-                          <ArrowRight className="ml-5 h-2.5 w-2.5 sm:h-3 sm:w-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                        <ArrowRight className="ml-5 h-2.5 w-2.5 sm:h-3 sm:w-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                       </Link>
                     </motion.li>
                   ))}
@@ -234,12 +228,6 @@ export default function Footer() {
                 >
                   Terms of Service
                 </Link>
-                <Link
-                  href="#"
-                  className="hover:text-white transition-colors whitespace-nowrap"
-                >
-                  Cookie Policy
-                </Link>
               </div>
             </div>
 
@@ -256,9 +244,9 @@ export default function Footer() {
                   </Link>
                 ))}
               </div>
-              <div className="text-xs sm:text-sm text-white/80 text-center sm:text-left">
-                Powered by AI • Built with{" "}
-                <span className="text-base sm:text-lg">🩵</span>
+              <div className="text-xs sm:text-sm text-white text-center sm:text-left">
+                Powered by AI & Built with{" "}
+                <span className="text-base sm:text-lg">🩷</span>
               </div>
             </div>
           </div>
