@@ -8,15 +8,11 @@ import SmallFooter from "@/components/smallFooter";
 
 export default function HelpForm() {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
     email: "",
     message: "",
   });
 
   const [errors, setErrors] = useState<{
-    firstName?: string;
-    lastName?: string;
     email?: string;
     message?: string;
   }>({});
@@ -28,10 +24,6 @@ export default function HelpForm() {
 
   const validate = () => {
     const errs: Record<string, string> = {};
-    if (!formData.firstName.trim() || formData.firstName.length < 2)
-      errs.firstName = "First name must be at least 2 characters.";
-    if (!formData.lastName.trim() || formData.lastName.length < 2)
-      errs.lastName = "Last name must be at least 2 characters.";
     if (
       !formData.email.trim() ||
       !/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(formData.email)
@@ -58,8 +50,6 @@ export default function HelpForm() {
       if (res?.success) {
         toast.success("Help request sent successfully.");
         setFormData({
-          firstName: "",
-          lastName: "",
           email: "",
           message: "",
         });
@@ -104,25 +94,6 @@ export default function HelpForm() {
         onSubmit={handleSubmit}
         className="mx-auto mt-16 max-w-xl sm:mt-20 relative z-10 space-y-6"
       >
-        <div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
-          {(["firstName", "lastName"] as const).map((field) => (
-            <div key={field}>
-              <label className="block text-sm font-semibold text-gray-900">
-                {field === "firstName" ? "First Name" : "Last Name"}
-              </label>
-              <input
-                type="text"
-                value={formData[field]}
-                onChange={(e) => handleChange(field, e.target.value)}
-                className="mt-2.5 block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-sky-500"
-              />
-              {errors[field] && (
-                <p className="text-sm text-red-500 mt-1">{errors[field]}</p>
-              )}
-            </div>
-          ))}
-        </div>
-
         <div>
           <label className="block text-sm font-semibold text-gray-900">
             Email Address

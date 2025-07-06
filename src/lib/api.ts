@@ -7,14 +7,11 @@ interface ApiResponse<T = any> {
   data?: T;
 }
 interface sendConnectPayload {
-  name: string;
   email: string;
   message: string;
 }
 
 interface sendHelpPayload {
-  firstName: string;
-  lastName: string;
   email: string;
   message: string;
 }
@@ -123,16 +120,23 @@ class ApiClient {
     });
   }
   async sendHelp(payload: sendHelpPayload): Promise<ApiResponse> {
-    return this.request("/user/help", {
+    return this.request("/public/help", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
     });
   }
   async sendConnect(payload: sendConnectPayload): Promise<ApiResponse> {
-    return this.request("/user/connect", {
+    return this.request("/public/connect", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
     });
   }
-
   async sendConnection(payload: sendConnectionPayload): Promise<ApiResponse> {
     const formData = new FormData();
 

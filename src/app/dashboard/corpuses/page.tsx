@@ -44,8 +44,8 @@ export default function CorpusPage() {
     if (!inputFiles || inputFiles.length === 0) return;
 
     const files = Array.from(inputFiles);
-    if (files.length > 5) {
-      toast.error("Maximum five corpuses files allowed!");
+    if (files.length > 2) {
+      toast.error("Maximum two corpuses files allowed!");
       return;
     }
 

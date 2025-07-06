@@ -8,7 +8,6 @@ import SmallFooter from "@/components/smallFooter";
 
 export default function ConnectionForm() {
   const [form, setForm] = useState({
-    name: "",
     email: "",
     message: "",
   });
@@ -25,9 +24,9 @@ export default function ConnectionForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const { name, email, message } = form;
+    const { email, message } = form;
 
-    if (!name.trim() || !email.trim() || !message.trim()) {
+    if (!email.trim() || !message.trim()) {
       toast.error("All fields are required.");
       return;
     }
@@ -47,7 +46,7 @@ export default function ConnectionForm() {
       const res = await apiClient.sendConnect(form);
       if (res.success) {
         toast.success("Thanks! We’ll be in touch soon.");
-        setForm({ name: "", email: "", message: "" });
+        setForm({ email: "", message: "" });
       } else {
         toast.error("Something went wrong. Please try again.");
       }
@@ -61,8 +60,6 @@ export default function ConnectionForm() {
   return (
     <div className="relative isolate min-h-screen px-6 py-24 sm:py-32 lg:px-8 overflow-hidden">
       <LoginNavigation />
-
-      {/* Decorative background blur */}
       <div
         className="fixed top-[-120px] left-[-100px] w-[400px] h-[400px] bg-gradient-to-tr from-sky-200 to-sky-300 opacity-30 blur-lg rounded-full"
         style={{ clipPath: "circle(60% at 50% 50%)" }}
@@ -91,24 +88,6 @@ export default function ConnectionForm() {
         className="mx-auto mt-16 max-w-xl sm:mt-20 relative z-10"
       >
         <div className="grid grid-cols-1 gap-y-6">
-          {/* Name */}
-          <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-semibold text-gray-900"
-            >
-              Name
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={form.name}
-              onChange={(e) => handleChange("name", e.target.value)}
-              className="mt-2.5 block w-full rounded-md bg-white px-3.5 py-2 text-base text-gray-900 outline-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-sky-500"
-              placeholder="John Doe"
-              required
-            />
-          </div>
 
           {/* Email */}
           <div>

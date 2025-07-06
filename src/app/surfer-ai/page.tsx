@@ -16,19 +16,15 @@ import {
   Mic,
   EarIcon,
   SendHorizonal,
-  Waves,
   Search,
   Loader2,
   Upload,
-  FileLock,
-  FileCheck2,
   Eye,
   File,
   CircleX,
-  ArrowUp,
   Files,
 } from "lucide-react";
-import { cn, openFileInNewTab, toBase64 } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
@@ -38,7 +34,6 @@ import { useHydration } from "@/hooks/useHydration";
 import { userStore } from "@/stores/userStore";
 import { toast } from "sonner";
 import { AttachmentFile } from "@/types/app.types";
-import Toolbar from "@/components/ui/toolbar";
 import Folders from "@/components/ui/folder";
 
 declare global {
