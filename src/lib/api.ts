@@ -82,7 +82,7 @@ class ApiClient {
             ...options.headers,
           };
 
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      const response = await fetch(`${this.baseUrl}/api${endpoint}`, {
         credentials: "include",
         headers,
         ...options,
