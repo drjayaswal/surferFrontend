@@ -65,7 +65,7 @@ class ApiClient {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = process.env.SERVER!;
+    this.baseUrl = process.env.NEXT_PUBLIC_SERVER!;
   }
 
   private async request<T>(
