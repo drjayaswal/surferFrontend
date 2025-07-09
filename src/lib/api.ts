@@ -61,12 +61,6 @@ interface VerifyLoginOtpPayload {
 }
 
 class ApiClient {
-  private baseUrl: string;
-
-  constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_SERVER!;
-  }
-
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
@@ -81,11 +75,14 @@ class ApiClient {
             ...options.headers,
           };
 
-      const response = await fetch(`${this.baseUrl}${endpoint}`, {
-        credentials: "include",
-        headers,
-        ...options,
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER}${endpoint}`,
+        {
+          credentials: "include",
+          headers,
+          ...options,
+        }
+      );
 
       const data = await response.json();
       return data;

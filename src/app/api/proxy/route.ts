@@ -28,7 +28,7 @@ async function handleProxy(request: NextRequest) {
       );
     }
 
-    const backendUrl = `https://surfer-backend.onrender.com/api${path}`;
+    const backendUrl = `${process.env.NEXT_PUBLIC_SERVER}${path}`;
 
     // Forward the request to the backend
     const response = await fetch(backendUrl, {
