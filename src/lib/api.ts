@@ -62,12 +62,6 @@ interface VerifyLoginOtpPayload {
 }
 
 class ApiClient {
-  private baseUrl: string;
-
-  constructor() {
-    this.baseUrl = process.env.NEXT_PUBLIC_SERVER!;
-  }
-
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
@@ -82,11 +76,14 @@ class ApiClient {
             ...options.headers,
           };
 
-      const response = await fetch(`${this.baseUrl}/api${endpoint}`, {
-        credentials: "include",
-        headers,
-        ...options,
-      });
+      const response = await fetch(
+        `https://surfer-backend.onrender.com/api${endpoint}`,
+        {
+          credentials: "include",
+          headers,
+          ...options,
+        }
+      );
 
       const data = await response.json();
       return data;

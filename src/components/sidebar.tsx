@@ -139,7 +139,7 @@ export function AppSidebar() {
   const handleLogOut = async () => {
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER}/api/auth/logout`,
+        "https://surfer-backend.onrender.com/api/auth/logout",
         {
           method: "GET",
           credentials: "include",
