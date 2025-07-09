@@ -1,4 +1,5 @@
 "use client";
+import "dotenv/config";
 
 interface ApiResponse<T = any> {
   success: boolean;
@@ -64,7 +65,7 @@ class ApiClient {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = process.env.SERVER || "http://localhost:4000/api";
+    this.baseUrl = process.env.SERVER!;
   }
 
   private async request<T>(
