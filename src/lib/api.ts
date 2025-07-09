@@ -1,10 +1,4 @@
 "use client";
-import "dotenv/config";
-
-// API Configuration
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://surfer-backend.onrender.com/api";
-const USE_PROXY = process.env.NEXT_PUBLIC_USE_PROXY === "true";
 
 interface ApiResponse<T = any> {
   success: boolean;
@@ -67,6 +61,12 @@ interface VerifyLoginOtpPayload {
 }
 
 class ApiClient {
+  private baseUrl: string;
+
+  constructor() {
+    this.baseUrl = process.env.NEXT_PUBLIC_SERVER!;
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
@@ -75,58 +75,22 @@ class ApiClient {
       const isFormData = options.body instanceof FormData;
 
       const headers: HeadersInit = isFormData
-        ? {
-            ...options.headers,
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization",
-          }
+        ? { ...options.headers } // Let browser set Content-Type with boundary
         : {
             "Content-Type": "application/json",
-            // Add CORS headers for JSON requests
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization",
             ...options.headers,
           };
 
-      // Use local proxy route to avoid CORS issues
-      const proxyUrl = `/api/proxy?path=${encodeURIComponent(endpoint)}`;
-
-      // Choose between direct API call or proxy based on environment
-      const requestUrl = USE_PROXY ? proxyUrl : `${API_BASE_URL}${endpoint}`;
-
-      const response = await fetch(requestUrl, {
+      const response = await fetch(`${this.baseUrl}${endpoint}`, {
         credentials: "include",
-        mode: "cors", // Explicitly set CORS mode
         headers,
         ...options,
       });
-
-      // Check if response is ok before parsing JSON
-      if (!response.ok) {
-        if (response.status === 0) {
-          // CORS error
-          throw new Error("CORS error: Unable to reach the server");
-        }
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
 
       const data = await response.json();
       return data;
     } catch (error) {
       console.error("API request failed:", error);
-
-      // Handle CORS errors specifically
-      if (error instanceof Error && error.message.includes("CORS")) {
-        return {
-          success: false,
-          code: 0,
-          message:
-            "CORS error: Unable to reach the server. Please check your network connection.",
-        };
-      }
-
       return {
         success: false,
         code: 500,
