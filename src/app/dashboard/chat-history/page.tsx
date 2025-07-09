@@ -6,12 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -20,24 +14,13 @@ import {
 } from "@/components/ui/dialog";
 import {
   MessageSquare,
-  Search,
-  Filter,
-  ChevronDown,
   Clock,
-  MoreHorizontal,
   Star,
-  Trash2,
   Download,
-  Share2,
-  ArrowRight,
-  Bot,
   User,
-  Sparkles,
   MessageCircleQuestion,
-  Waves,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 import ComingSoonPage from "@/components/comingSoon";
 
 interface ChatMessage {

@@ -1,0 +1,114 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Shapes } from "lucide-react";
+import Link from "next/link";
+import Navigation from "@/components/navigation";
+import PremiumSearchBar from "@/components/searchBar";
+import Footer from "@/components/footer";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+
+export default function Home() {
+  const [isWaveActive, setIsWaveActive] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  const searchParams = useSearchParams();
+  const urlQuery = searchParams.get("msg") || searchParams.get("message");
+
+  useEffect(() => {
+    if (urlQuery) {
+      toast("Already Logged In..!");
+    }
+    if (typeof window !== "undefined" && window.history.replaceState) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("msg");
+      url.searchParams.delete("message");
+      window.history.replaceState(
+        {},
+        document.title,
+        url.pathname + url.search
+      );
+    }
+  }, [urlQuery]);
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsWaveActive(true);
+      setTimeout(() => setIsWaveActive(false), 3000);
+    }, 8000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleSearch = (query: string) => {
+    console.log("Searching for:", query);
+    // Redirect to dashboard with search query
+    window.location.href = `/surfer-ai?q=${encodeURIComponent(query)}`;
+  };
+
+  return (
+    <div className="min-h-full relative overflow-visible">
+      <Navigation />
+      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="mb-8"
+            >
+              <h1 className="text-7xl font-bold mb-6">
+                <span className="bg-gradient-to-r from-sky-200 via-sky-400 to-sky-600 bg-clip-text text-transparent">
+                  Surf the <span className="italic">Wave</span>
+                </span>
+                <br />
+                <span className="text-gray-800">of AI Innovation</span>
+              </h1>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="mb-8"
+            >
+              <PremiumSearchBar onSearch={handleSearch} />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+      <section className="py-20 relative overflow-hidden">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sky-200 via-sky-400 to-sky-600 bg-clip-text text-transparent mb-6">
+              Ready to Surf the AI Wave?
+            </h2>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/surfer-playground">
+                <Button
+                  size="lg"
+                  className="hover:bg-gradient-to-r hover:from-sky-200 hover:via-sky-400 hover:to-sky-500 px-4 rounded-4xl bg-transparent hover:text-white text-sky-400 py-5 text-xl shadow-none cursor-pointer"
+                >
+                  <Shapes className="animate-spin" />
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+      <Footer />
+    </div>
+  );
+}

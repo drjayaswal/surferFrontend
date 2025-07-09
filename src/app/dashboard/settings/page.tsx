@@ -20,7 +20,6 @@ import { Separator } from "@/components/ui/separator";
 import {
   User,
   Download,
-  Upload,
   Eye,
   EyeOff,
   Trash2,
@@ -37,8 +36,7 @@ import {
   Database,
   MousePointerClick,
 } from "lucide-react";
-import { cn, formatTime, generateApiKey, toBase64 } from "@/lib/utils";
-import { ActivityLog } from "@/types/app.types";
+import { cn, generateApiKey, toBase64 } from "@/lib/utils";
 import { apiClient } from "@/lib/api";
 import { toast } from "sonner";
 import { userStore } from "@/stores/userStore";

@@ -15,8 +15,6 @@ import {
   CalendarIcon,
   Eye,
   EyeClosed,
-  EyeOff,
-  MousePointerClickIcon,
   SearchCheckIcon,
   Loader2,
 } from "lucide-react";
