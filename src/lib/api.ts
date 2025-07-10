@@ -83,7 +83,7 @@ class ApiClient {
           ...options,
         }
       );
-
+      this.handleCookies(response);
       const data = await response.json();
       return data;
     } catch (error) {
@@ -93,6 +93,20 @@ class ApiClient {
         code: 500,
         message: "Network error occurred",
       };
+    }
+  }
+  private handleCookies(response: Response) {
+    const setCookieHeader = response.headers.get("set-cookie");
+    if (setCookieHeader) {
+      console.log("Incoming cookies:", setCookieHeader);
+      const cookies = setCookieHeader.split(",");
+      cookies.forEach((cookie) => {
+        const [nameValue] = cookie.split(";");
+        const [name, value] = nameValue.split("=");
+        if (name && value) {
+          console.log(`Storing cookie: ${name.trim()} = ${value.trim()}`);
+        }
+      });
     }
   }
   async generateOtp(payload: GenerateOtpPayload): Promise<ApiResponse> {
