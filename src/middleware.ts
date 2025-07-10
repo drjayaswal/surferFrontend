@@ -1,32 +1,38 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-
-import { unprotected_routes } from "./lib/const";
 import { is_authenticated } from "./lib/authenticator";
+import { unprotected_routes } from "./lib/const";
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  try {
+    const { pathname } = request.nextUrl;
+    const isPublicPath = unprotected_routes.includes(pathname);
 
-  const isPublicPath = unprotected_routes.includes(pathname);
+    // Check auth
+    const isAuth = await is_authenticated(request);
 
-  const isAuth = await is_authenticated(request);
+    // Try to extract role from token
+    const token = request.cookies.get("access_token")?.value;
 
-  const response = NextResponse.next();
-  response.headers.set("x-middleware-cache", "no-cache");
+    const response = NextResponse.next();
+    response.headers.set("x-middleware-cache", "no-cache");
 
-  if (pathname === "/login" && isAuth) {
-    const url = new URL("/", request.url);
-    url.searchParams.set("message", "already-logged-in");
-    return NextResponse.redirect(url);
+    // 1. Redirect logged-in users away from /login
+    if (pathname === "/login" && isAuth) {
+      return NextResponse.redirect(new URL(`/`, request.url));
+    }
+
+    // 2. Block access to protected routes if not authenticated
+    if (!isPublicPath && !isAuth) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    return response;
+  } catch (err) {
+    console.error("[MIDDLEWARE] Unexpected error:", err);
+    return NextResponse.redirect(new URL("/error", request.url)); // Optional fallback
   }
-
-  if (!isPublicPath && !isAuth) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  return response;
 }
-
 export const config = {
   matcher: [
     "/((?!api|_next|static|favicon.png|site.webmanifest|Images|icon-512.png|signin).*)",
